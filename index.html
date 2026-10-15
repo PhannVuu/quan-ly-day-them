@@ -1,0 +1,2554 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Quản lý dạy thêm">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3429/3429149.png">
+  <title>Quản lý dạy thêm</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Bodoni:ital,wght@0,400..700;1,400..700&family=Oi&family=Pacifico&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary:#2563eb; --primary-hover:#1d4ed8; --primary-light:#eff6ff;
+      --success:#15803d; --success-bg:#dcfce7; --success-border:#86efac;
+      --warning:#b45309; --warning-bg:#fef3c7; --warning-border:#fcd34d;
+      --danger:#b91c1c; --danger-bg:#fee2e2; --danger-border:#fca5a5;
+      --bg:#f1f5f9; --card:#ffffff; --border:#cbd5e1;
+      --text:#0f172a; --muted:#475569;
+      --focus-ring:0 0 0 3px rgba(37,99,235,0.35);
+    }
+    * { box-sizing:border-box; margin:0; padding:0; font-family:'Roboto',-apple-system,BlinkMacSystemFont,sans-serif; -webkit-tap-highlight-color:transparent; }
+    body { background:var(--bg); color:var(--text); line-height:1.5; padding-bottom:calc(40px + env(safe-area-inset-bottom)); }
+
+    /* Hệ thống SVG Icon nội tuyến chuẩn Google Material (Không bao giờ lỗi trên iPhone) */
+    .g-icon { width:18px; height:18px; fill:currentColor; display:inline-block; vertical-align:middle; flex-shrink:0; user-select:none; }
+    .g-icon.icon-sm { width:16px; height:16px; }
+    .g-icon.icon-lg { width:22px; height:22px; }
+
+    /* Chuyển Tab bằng Radio */
+    .tab-radio { position:absolute; opacity:0; width:1px; height:1px; pointer-events:none; }
+    #view-checkin, #view-billing, #view-students { display:none; }
+    #rad_tab_checkin:checked ~ .container #view-checkin,
+    #rad_tab_billing:checked ~ .container #view-billing,
+    #rad_tab_students:checked ~ .container #view-students { display:block; }
+    #rad_tab_checkin:checked ~ header #tabBtn-checkin,
+    #rad_tab_billing:checked ~ header #tabBtn-billing,
+    #rad_tab_students:checked ~ header #tabBtn-students {
+      background:var(--primary); color:#fff; border-color:var(--primary); box-shadow:0 2px 6px rgba(37,99,235,0.25);
+    }
+
+    header {
+      background:var(--card); border-bottom:1px solid var(--border);
+      padding:calc(10px + env(safe-area-inset-top)) 10mm 10px 10mm;
+      display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
+      position:sticky; top:0; z-index:50; box-shadow:0 2px 4px rgba(0,0,0,0.04);
+    }
+    .brand { font-size:18px; font-weight:800; color:var(--primary); display:flex; align-items:center; gap:8px; }
+    .nav-tabs { display:flex; gap:6px; flex-wrap:wrap; }
+    .tab-btn { min-height:36px; padding:7px 14px; border:1px solid var(--border); background:#f8fafc; border-radius:8px; cursor:pointer; font-weight:700; font-size:13.5px; color:#334155; display:inline-flex; align-items:center; gap:6px; transition:0.15s; user-select:none; }
+    .tab-btn:hover { border-color:var(--primary); color:var(--primary); }
+
+    .menu-wrap { position:relative; }
+    .dropdown-menu { position:absolute; right:0; top:calc(100% + 6px); background:var(--card); border:1px solid var(--border); border-radius:10px; box-shadow:0 10px 25px rgba(0,0,0,0.14); min-width:255px; z-index:100; display:none; overflow:hidden; padding:4px 0; }
+    .dropdown-menu.open { display:block; }
+    .menu-item { width:100%; min-height:40px; padding:9px 14px; border:none; background:none; text-align:left; font-size:13.5px; font-weight:500; color:var(--text); display:flex; align-items:center; gap:10px; cursor:pointer; }
+    .menu-item:hover { background:#f1f5f9; color:var(--primary); }
+    .menu-divider { height:1px; background:#e2e8f0; margin:4px 0; }
+
+    /* Container lề 1cm (10mm) trên PC, tự thu gọn trên iPhone */
+    .container { width:100%; max-width:100%; margin:14px auto; padding:0 10mm; }
+    .split-layout { display:grid; grid-template-columns:minmax(0,7fr) minmax(0,3fr); gap:16px; align-items:start; }
+    @media (max-width:1024px) { .split-layout { grid-template-columns:1fr; } }
+    @media (max-width:640px) {
+      header { padding:calc(8px + env(safe-area-inset-top)) 12px 8px 12px; }
+      .container { padding:0 12px; margin:10px auto; }
+      .brand span { font-size:16px; }
+      .tab-btn { padding:6px 10px; font-size:12.5px; }
+    }
+
+    .card { background:var(--card); border:1px solid #e2e8f0; border-radius:12px; padding:16px; box-shadow:0 1px 3px rgba(0,0,0,0.05); }
+    .card-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid #e2e8f0; }
+    .card-title { font-size:15.5px; font-weight:700; color:#1e293b; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+
+    /* MÀN HÌNH CHECK-IN CARDS */
+    .checkin-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; margin-top:12px; }
+    .checkin-card {
+      background:#fff; border:1.5px solid #cbd5e1; border-radius:12px; padding:15px;
+      display:flex; flex-direction:column; gap:12px; transition:all 0.2s;
+      box-shadow:0 2px 5px rgba(0,0,0,0.03);
+    }
+    .checkin-card.priority-today { border-color:var(--primary); background:linear-gradient(180deg,#f8faff 0%,#ffffff 100%); border-left:5px solid var(--primary); }
+    .checkin-card-top { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+    .checkin-stu-name { font-size:17px; font-weight:800; color:#0f172a; }
+    .checkin-parent { font-size:12.5px; color:var(--muted); margin-top:2px; }
+    .checkin-controls { display:grid; grid-template-columns:1fr 1.2fr; gap:8px; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0; }
+    .checkin-actions { display:flex; gap:8px; }
+    .btn-checkin-main { flex:1; min-height:42px; font-size:14px; font-weight:700; }
+    .section-sub-label { font-size:13px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.4px; margin:16px 0 8px 0; display:flex; align-items:center; gap:6px; }
+
+    /* Nút Tick Check-in trong lịch chi tiết */
+    .chk-in-toggle {
+      display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:6px;
+      font-size:11.5px; font-weight:700; cursor:pointer; border:1px solid #cbd5e1;
+      background:#f8fafc; color:var(--muted); transition:0.15s; user-select:none;
+    }
+    .chk-in-toggle.checked { background:var(--success-bg); color:var(--success); border-color:var(--success-border); }
+    .chk-in-toggle:hover { border-color:var(--primary); }
+
+    .default-schedule-banner { background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid var(--primary); padding:8px 12px; border-radius:6px; margin-bottom:10px; font-size:13px; display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; }
+    .legend-bar { display:flex; gap:14px; flex-wrap:wrap; align-items:center; font-size:12px; color:var(--muted); margin-bottom:12px; padding:6px 10px; background:#f8fafc; border-radius:6px; border:1px dashed #cbd5e1; }
+    .legend-item { display:inline-flex; align-items:center; gap:5px; font-weight:500; }
+    .legend-dot { width:10px; height:10px; border-radius:3px; display:inline-block; }
+
+    /* Forms */
+    .form-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:12px; }
+    .form-group { display:flex; flex-direction:column; gap:5px; margin-bottom:12px; }
+    label.field-label { font-size:13px; font-weight:700; color:#334155; display:flex; align-items:center; gap:6px; }
+    input, select, textarea { min-height:38px; padding:7px 10px; border:1px solid var(--border); border-radius:6px; font-size:14px; color:var(--text); background:#fff; }
+    input:focus, select:focus, textarea:focus, button:focus-visible { outline:none; border-color:var(--primary); box-shadow:var(--focus-ring); }
+    input.input-error { border-color:var(--danger); background:#fef2f2; }
+    .money-input { text-align:right; font-variant-numeric:tabular-nums; }
+    .money-readonly { background:#f1f5f9 !important; color:var(--muted) !important; cursor:not-allowed; font-weight:600 !important; }
+
+    /* Buttons */
+    .btn { min-height:36px; padding:7px 13px; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; border:1px solid transparent; display:inline-flex; align-items:center; justify-content:center; gap:5px; user-select:none; transition:0.15s; }
+    .btn-primary { background:var(--primary); color:#fff; } .btn-primary:hover { background:var(--primary-hover); }
+    .btn-success { background:var(--success); color:#fff; } .btn-success:hover { filter:brightness(0.95); }
+    .btn-danger { background:var(--danger-bg); color:var(--danger); border-color:var(--danger-border); }
+    .btn-outline { background:#fff; border-color:var(--border); color:#334155; } .btn-outline:hover { background:#f8fafc; border-color:#94a3b8; }
+    .btn-outline.active { background:var(--primary-light); border-color:var(--primary); color:var(--primary); }
+    .btn-sm { min-height:32px; padding:4px 10px; font-size:12.5px; }
+    .btn-icon-only { min-width:34px; min-height:34px; padding:5px; border-radius:6px; }
+
+    /* Cloud Sync Status Pill */
+    .sync-btn { font-size:12px; padding:5px 10px; border-radius:20px; }
+    .sync-btn.synced { background:var(--success-bg); color:var(--success); border-color:var(--success-border); }
+    .sync-btn.syncing { background:var(--warning-bg); color:var(--warning); border-color:var(--warning-border); }
+
+    /* Badges */
+    .badge { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:12px; font-size:11.5px; font-weight:600; background:#e2e8f0; color:#1e293b; margin:2px 2px 2px 0; }
+    .badge-blue { background:#dbeafe; color:#1e40af; }
+    .badge-past { background:var(--warning-bg); color:var(--warning); border:1px solid var(--warning-border); }
+    .badge-current { background:var(--success-bg); color:var(--success); border:1px solid var(--success-border); }
+
+    /* Tables */
+    table { width:100%; border-collapse:collapse; font-size:13.5px; }
+    th, td { padding:8px; border-bottom:1px solid #e2e8f0; text-align:left; vertical-align:middle; }
+    th { background:#f8fafc; font-weight:700; color:var(--muted); font-size:11.5px; text-transform:uppercase; }
+    tr.row-absent { background:#fff1f2; color:#9f1239; }
+    tr.row-carry-unpaid { background:var(--danger-bg); color:var(--danger); }
+    tr.row-carry-paid { background:var(--success-bg); color:var(--success); }
+    tr.row-makeup { background:#f0fdf4; }
+    tr.row-extra { background:#eff6ff; }
+    .weekday-tag { display:inline-block; min-width:56px; text-align:center; padding:2px 5px; border-radius:4px; font-size:11px; font-weight:700; background:#e2e8f0; color:#334155; }
+    .status-cell-wrap { display:flex; align-items:center; gap:5px; }
+
+    /* Summary & Message Box */
+    .summary-box { margin-bottom:14px; padding:12px 14px; background:var(--primary-light); border:1px solid #bfdbfe; border-radius:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+    .total-amount { font-size:20px; font-weight:800; color:var(--primary); font-variant-numeric:tabular-nums; }
+    .msg-textarea { width:100%; min-height:255px; font-size:13.5px; line-height:1.55; padding:12px; background:#f8fafc; border:1px solid var(--border); border-radius:8px; resize:vertical; }
+    .chk-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:5px 8px; border-radius:6px; cursor:pointer; font-size:13px; }
+    .chk-row.disabled { opacity:0.55; cursor:not-allowed; }
+    .chk-hint { font-size:11px; color:var(--muted); background:#e2e8f0; padding:1px 6px; border-radius:10px; font-weight:500; }
+
+    /* Calendar View */
+    .carry-banner-list { display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
+    .carry-banner-item { padding:8px 12px; border-radius:6px; font-size:13px; display:flex; justify-content:space-between; align-items:center; font-weight:500; flex-wrap:wrap; gap:6px; }
+    .carry-banner-item.unpaid { background:var(--danger-bg); color:var(--danger); border:1px solid var(--danger-border); border-left:4px solid var(--danger); }
+    .carry-banner-item.paid { background:var(--success-bg); color:var(--success); border:1px solid var(--success-border); border-left:4px solid var(--success); }
+
+    .cal-scroll-wrap { overflow-x:auto; padding-bottom:4px; }
+    .cal-grid { display:grid; grid-template-columns:repeat(7,minmax(115px,1fr)); gap:6px; min-width:820px; }
+    .cal-head { background:#e2e8f0; padding:7px 4px; text-align:center; font-weight:700; font-size:12px; color:#1e293b; border-radius:6px; }
+    .cal-cell { min-height:118px; border:1px solid #cbd5e1; border-radius:8px; padding:6px; background:#fff; display:flex; flex-direction:column; gap:6px; position:relative; }
+    .cal-cell.is-today { border:2px solid var(--primary); background:#f8faff; }
+    .cal-cell.empty { background:#f8fafc; border-style:dashed; min-height:60px; opacity:0.65; }
+    .cal-cell-top { display:flex; justify-content:space-between; align-items:center; font-size:12px; font-weight:700; color:var(--muted); min-height:26px; }
+    .today-pill { background:var(--primary); color:#fff; font-size:10px; padding:1px 5px; border-radius:8px; font-weight:700; margin-left:4px; }
+    .cal-add-btn { min-width:28px; min-height:28px; border:1px solid #cbd5e1; background:#f8fafc; color:var(--primary); cursor:pointer; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; }
+    .cal-del-btn { min-width:26px; min-height:26px; border:none; background:transparent; color:var(--danger); cursor:pointer; border-radius:4px; display:inline-flex; align-items:center; justify-content:center; }
+
+    .cal-sess-card { padding:6px; border-radius:6px; border:1px solid #cbd5e1; border-left-width:3.5px; font-size:11.5px; display:flex; flex-direction:column; gap:4px; background:#fff; }
+    .cal-sess-card.st-normal { background:#f0fdf4; border-color:#bbf7d0; border-left-color:var(--success); }
+    .cal-sess-card.st-absent { background:#fff1f2; border-color:#fecdd3; border-left-color:var(--danger); }
+    .cal-sess-card.st-makeup { background:#dcfce7; border-color:#86efac; border-left-color:#059669; }
+    .cal-sess-card.st-extra { background:#eff6ff; border-color:#bfdbfe; border-left-color:var(--primary); }
+    .cal-sess-row { display:flex; justify-content:space-between; align-items:center; gap:4px; }
+    .cal-mini-select, .cal-mini-input { min-height:28px; padding:2px 5px; font-size:11.5px; border-radius:4px; border:1px solid #cbd5e1; width:100%; background:#fff; }
+
+    /* Collapse & Modals */
+    .collapse-box { border:1px solid #cbd5e1; border-radius:8px; background:#f8fafc; margin-bottom:12px; overflow:hidden; }
+    .collapse-header { padding:10px 12px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; user-select:none; background:#f1f5f9; gap:8px; }
+    .collapse-body { padding:12px; border-top:1px solid #e2e8f0; display:none; background:#fff; }
+    .collapse-box.open .collapse-body { display:block; }
+    .rate-list { display:flex; flex-direction:column; gap:8px; margin-bottom:4px; }
+    .rate-item { display:grid; grid-template-columns:1fr 1.3fr auto; gap:8px; align-items:center; background:#f8fafc; padding:8px; border-radius:6px; border:1px solid #e2e8f0; }
+    .weekday-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(135px,1fr)); gap:8px; margin-top:6px; }
+    .weekday-card { border:1px solid #cbd5e1; border-radius:8px; padding:8px 10px; background:#f8fafc; display:flex; flex-direction:column; gap:6px; }
+    .weekday-card.active { border-color:var(--primary); background:var(--primary-light); }
+
+    .modal-backdrop { position:fixed; inset:0; background:rgba(15,23,42,0.55); display:none; align-items:center; justify-content:center; z-index:200; padding:14px; }
+    .modal-backdrop.open { display:flex; }
+    .modal-box { background:#fff; border-radius:12px; max-width:640px; width:100%; max-height:92vh; overflow-y:auto; padding:20px; box-shadow:0 12px 32px rgba(0,0,0,0.25); }
+    .modal-sm { max-width:460px; }
+    .toast { position:fixed; bottom:calc(20px + env(safe-area-inset-bottom)); right:20px; background:#0f172a; color:#fff; padding:12px 18px; border-radius:8px; font-size:14px; font-weight:600; opacity:0; pointer-events:none; transition:opacity 0.25s; z-index:999; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 14px rgba(0,0,0,0.2); }
+    .toast.show { opacity:1; }
+  </style>
+</head>
+<body>
+
+<!-- TAB MẶC ĐỊNH KHI MỞ APP LÀ CHECK-IN (rad_tab_checkin checked) -->
+<input type="radio" name="main_tab_switch" id="rad_tab_checkin" class="tab-radio" checked>
+<input type="radio" name="main_tab_switch" id="rad_tab_billing" class="tab-radio">
+<input type="radio" name="main_tab_switch" id="rad_tab_students" class="tab-radio">
+
+<header>
+  <div class="brand">
+    <i data-icon="school" class="icon-lg"></i>
+    <span>Quản lý dạy thêm</span>
+  </div>
+  <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+    <div class="nav-tabs" role="tablist">
+      <label for="rad_tab_checkin" id="tabBtn-checkin" class="tab-btn" onclick="switchTab('checkin')">
+        <i data-icon="fact_check"></i>
+        <span>Check-in</span>
+      </label>
+      <label for="rad_tab_billing" id="tabBtn-billing" class="tab-btn" onclick="switchTab('billing')">
+        <i data-icon="payments"></i>
+        <span>Học phí</span>
+      </label>
+      <label for="rad_tab_students" id="tabBtn-students" class="tab-btn" onclick="switchTab('students')">
+        <i data-icon="manage_accounts"></i>
+        <span>Học viên</span>
+      </label>
+    </div>
+
+    <!-- Nút Đồng bộ Đám mây giữa iPhone & Máy tính -->
+    <button type="button" id="cloudSyncHeaderBtn" class="btn btn-outline sync-btn" onclick="openCloudSyncModal()" title="Đồng bộ dữ liệu iPhone & Máy tính">
+      <i data-icon="cloud_off" class="icon-sm" id="cloudSyncHeaderIcon"></i>
+      <span id="cloudSyncHeaderText">Đồng bộ</span>
+    </button>
+
+    <div class="menu-wrap">
+      <button type="button" class="btn btn-outline btn-icon-only" onclick="toggleActionMenu(event)" title="Chức năng dữ liệu" aria-label="Menu dữ liệu">
+        <i data-icon="more_horiz"></i>
+      </button>
+      <div class="dropdown-menu" id="actionDropdown">
+        <button type="button" class="menu-item" onclick="openCloudSyncModal(); closeActionMenu();">
+          <i data-icon="sync" class="icon-sm"></i>
+          <span>Cấu hình đồng bộ iPhone ↔ Máy tính</span>
+        </button>
+        <div class="menu-divider"></div>
+        <button type="button" class="menu-item" onclick="exportJSON(); closeActionMenu();">
+          <i data-icon="download" class="icon-sm"></i>
+          <span>Xuất thiết lập học viên (json)</span>
+        </button>
+        <label class="menu-item" style="margin:0;">
+          <i data-icon="upload_file" class="icon-sm"></i>
+          <span>Nhập thiết lập học viên (json)</span>
+          <input type="file" id="importFileInput" accept=".json,.txt" style="display:none" onchange="importJSON(event); closeActionMenu();">
+        </label>
+        <div class="menu-divider"></div>
+        <button type="button" class="menu-item" onclick="exportCSV(); closeActionMenu();">
+          <i data-icon="table_view" class="icon-sm"></i>
+          <span>Lưu thông tin học phí (excel)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <!-- ================= MÀN HÌNH 0 (MẶC ĐỊNH): CHECK-IN BUỔI HỌC HÔM NAY ================= -->
+  <section id="view-checkin">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">
+            <i data-icon="fact_check" style="color:var(--primary);"></i>
+            <span id="checkinHeaderTitle">Check-in buổi học hôm nay</span>
+          </div>
+          <div style="font-size:13px; color:var(--muted); margin-top:2px;">
+            Ưu tiên hiển thị học viên có lịch học hôm nay. Học viên đã check-in hôm nay sẽ tự động ẩn đi.
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button type="button" class="btn btn-outline btn-sm" onclick="pullFromCloud(true)" id="btnQuickPullCloud" style="display:none;">
+            <i data-icon="sync" class="icon-sm"></i>
+            <span>Tải dữ liệu mới nhất</span>
+          </button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="switchTab('billing')">
+            <i data-icon="calendar_month" class="icon-sm"></i>
+            <span>Xem lịch chi tiết</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="checkinContentArea"></div>
+    </div>
+  </section>
+
+  <!-- ================= MÀN HÌNH 1: HỌC PHÍ & LỊCH HỌC CHI TIẾT ================= -->
+  <section id="view-billing">
+    <div class="card" style="margin-bottom:14px; padding:12px 16px;">
+      <div class="form-row" style="margin-bottom:0; align-items:end;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="field-label" for="billingStudentSelect">Học viên</label>
+          <select id="billingStudentSelect" onchange="onStudentOrMonthChange()"></select>
+        </div>
+
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="field-label" for="billingMonthInput">
+            <span>Tháng</span>
+            <span id="monthStatusBadge" class="badge badge-current">Tháng hiện tại</span>
+          </label>
+          <div style="display:flex; gap:4px; align-items:center;">
+            <button type="button" class="btn btn-outline btn-icon-only" onclick="stepMonth(-1)" title="Tháng trước">
+              <i data-icon="chevron_left" class="icon-sm"></i>
+            </button>
+            <input type="month" id="billingMonthInput" onchange="onStudentOrMonthChange()" style="flex:1;">
+            <button type="button" class="btn btn-outline btn-icon-only" onclick="stepMonth(1)" title="Tháng sau">
+              <i data-icon="chevron_right" class="icon-sm"></i>
+            </button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="jumpToCurrentMonth()">Hôm nay</button>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn btn-primary" onclick="nextStudent()">
+            <i data-icon="skip_next"></i>
+            <span>Học viên tiếp theo</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="split-layout">
+      <!-- BÊN TRÁI (70%): LỊCH HỌC CHI TIẾT -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">
+              <i data-icon="calendar_month" style="color:var(--primary);"></i>
+              <span id="leftPanelTitle">Lịch học chi tiết</span>
+            </div>
+            <div id="studentRateBanner" style="font-size:12.5px; color:var(--muted); margin-top:3px;"></div>
+          </div>
+          <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+            <div style="display:flex; gap:4px; margin-right:4px;">
+              <button type="button" id="btnViewCalendar" class="btn btn-outline btn-sm active" onclick="setScheduleViewMode('calendar')">
+                <i data-icon="calendar_view_month" class="icon-sm"></i>
+                <span>Lịch</span>
+              </button>
+              <button type="button" id="btnViewList" class="btn btn-outline btn-sm" onclick="setScheduleViewMode('list')">
+                <i data-icon="view_list" class="icon-sm"></i>
+                <span>Danh sách</span>
+              </button>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm" onclick="requestAddSessionRow()">
+              <i data-icon="add_circle" class="icon-sm"></i>
+              <span>Thêm buổi</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="default-schedule-banner">
+          <div id="defaultScheduleText"><b>Lịch cố định hàng tuần:</b> Chưa có học viên</div>
+          <div style="display:flex; gap:6px;">
+            <button type="button" class="btn btn-outline btn-icon-only" onclick="requestResetMonthToDefault()" title="Reset lịch mặc định">
+              <i data-icon="restart_alt" class="icon-sm"></i>
+            </button>
+            <button type="button" class="btn btn-outline btn-icon-only" onclick="editCurrentBillingStudent()" title="Sửa lịch mặc định">
+              <i data-icon="edit_calendar" class="icon-sm"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="legend-bar">
+          <span style="font-weight:700; color:#334155;">Chú giải:</span>
+          <span class="legend-item"><span class="legend-dot" style="background:var(--success);"></span>Học theo lịch</span>
+          <span class="legend-item"><span class="legend-dot" style="background:var(--danger);"></span>Nghỉ / Nợ chưa bù</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#059669;"></span>Học bù / Đã bù</span>
+          <span class="legend-item"><span class="legend-dot" style="background:var(--primary);"></span>Học bổ sung</span>
+          <span class="legend-item"><i data-icon="check_circle" class="icon-sm" style="color:var(--success);"></i>Đã Check-in (Bấm để bật/tắt)</span>
+        </div>
+
+        <!-- VIEW DẠNG CALENDAR -->
+        <div id="scheduleCalendarContainer">
+          <div id="calendarCarryOverBanner" class="carry-banner-list"></div>
+          <div class="cal-scroll-wrap">
+            <div id="calendarGrid" class="cal-grid"></div>
+          </div>
+        </div>
+
+        <!-- VIEW DẠNG BẢNG DANH SÁCH -->
+        <div id="scheduleListContainer" style="overflow-x:auto; display:none;">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:34px;">#</th>
+                <th style="width:185px;">Ngày học (Thứ)</th>
+                <th style="width:98px;">Số giờ học</th>
+                <th style="width:120px;">Số tiền (VNĐ)</th>
+                <th>Trạng thái</th>
+                <th style="width:115px; text-align:center;">Check-in</th>
+                <th style="width:65px; text-align:center;">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="sessionTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- BÊN PHẢI (30%): TỔNG KẾT & TIN NHẮN GỬI PHỤ HUYNH -->
+      <div class="card">
+        <div class="summary-box">
+          <div>
+            <div style="font-size:13.5px; color:#1e3a8a; font-weight:700;" id="summaryBreakdown">Tổng số buổi học: 0 buổi</div>
+            <div id="summarySubDetail" style="font-size:12px; color:var(--muted); margin-top:2px;"></div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:11px; color:var(--muted); font-weight:700;">TỔNG TIỀN TRONG THÁNG</div>
+            <div class="total-amount" id="summaryTotalAmount">0 đ</div>
+          </div>
+        </div>
+
+        <div class="card-header">
+          <div class="card-title">
+            <i data-icon="chat" style="color:var(--primary);"></i>
+            <span>Tin nhắn gửi phụ huynh</span>
+          </div>
+          <button type="button" class="btn btn-success btn-icon-only" onclick="copyMessage()" title="Copy tin nhắn">
+            <i data-icon="content_copy" class="icon-sm"></i>
+          </button>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:4px; margin-bottom:10px;">
+          <label class="chk-row">
+            <span style="display:flex; align-items:center; gap:6px;">
+              <input type="checkbox" id="chkShowDates" checked onchange="onToggleShowDates(this.checked)">
+              <span>Kèm ngày học cụ thể</span>
+            </span>
+          </label>
+          <label class="chk-row" id="lblDeductUncompensated">
+            <span style="display:flex; align-items:center; gap:6px;">
+              <input type="checkbox" id="chkDeductUncompensated" onchange="requestToggleMonthOption('deductUncompensated', this)">
+              <span>Trừ buổi không học bù</span>
+            </span>
+            <span class="chk-hint" id="hintDeductUncompensated"></span>
+          </label>
+          <label class="chk-row" id="lblDeductCurrentAbsent">
+            <span style="display:flex; align-items:center; gap:6px;">
+              <input type="checkbox" id="chkDeductCurrentAbsent" onchange="requestToggleMonthOption('deductCurrentAbsent', this)">
+              <span>Trừ trực tiếp buổi nghỉ tháng này</span>
+            </span>
+            <span class="chk-hint" id="hintDeductCurrentAbsent"></span>
+          </label>
+        </div>
+
+        <textarea id="generatedMessageText" class="msg-textarea" placeholder="Chọn hoặc thêm học viên để tự động tạo tin nhắn..."></textarea>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MÀN HÌNH 2: DANH SÁCH HỌC VIÊN ================= -->
+  <section id="view-students">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <i data-icon="group" style="color:var(--primary);"></i>
+          <span>Danh Sách Học Viên</span>
+        </div>
+        <button type="button" class="btn btn-primary btn-sm" onclick="openAddStudentModal()">
+          <i data-icon="person_add" class="icon-sm"></i>
+          <span>Thêm mới</span>
+        </button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Học Viên</th>
+              <th>Phụ Huynh</th>
+              <th>Đơn Giá</th>
+              <th>Lịch Tuần Mặc Định</th>
+              <th style="text-align:right; width:100px;">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="studentListTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- POP-UP MODAL THÊM / SỬA HỌC VIÊN -->
+<div class="modal-backdrop" id="studentModal" onclick="onBackdropClick(event, 'studentModal')">
+  <div class="modal-box" role="dialog" aria-modal="true">
+    <div class="card-header" style="margin-bottom:14px;">
+      <div class="card-title" id="studentFormTitle">
+        <i data-icon="person_add" style="color:var(--primary);"></i>
+        <span>Thêm Học Viên Mới</span>
+      </div>
+      <button type="button" class="btn btn-outline btn-icon-only" onclick="closeStudentModal()" title="Đóng (Esc)">
+        <i data-icon="close" class="icon-sm"></i>
+      </button>
+    </div>
+
+    <input type="hidden" id="editStudentId" value="">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="field-label" for="studentNameInput">Tên Học Viên (*):</label>
+        <input type="text" id="studentNameInput" placeholder="VD: Minh Khôi" oninput="this.classList.remove('input-error')">
+      </div>
+      <div class="form-group">
+        <label class="field-label" for="parentTitleInput">Danh xưng PH:</label>
+        <select id="parentTitleInput">
+          <option value="chị">Chị</option>
+          <option value="anh">Anh</option>
+          <option value="cô">Cô</option>
+          <option value="bác">Bác</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="field-label" for="parentNameInput">Tên Phụ Huynh (*):</label>
+        <input type="text" id="parentNameInput" placeholder="VD: Hương" oninput="this.classList.remove('input-error')">
+      </div>
+    </div>
+
+    <div class="collapse-box" id="rateCollapseBox">
+      <div class="collapse-header" onclick="toggleRateCollapse()">
+        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+          <span id="rateCollapseIconWrap"></span>
+          <span style="font-size:13px; font-weight:700; color:#334155;">Cấu hình giờ học</span>
+          <span id="collapsedRateSummary" style="margin-left:4px;"></span>
+        </div>
+        <div style="display:flex; gap:6px;" onclick="event.stopPropagation();">
+          <button type="button" class="btn btn-outline btn-icon-only" onclick="resetRatesToDefault()" title="Mặc định (1h30: 450.000 / 2h: 500.000)">
+            <i data-icon="restart_alt" class="icon-sm"></i>
+          </button>
+          <button type="button" class="btn btn-primary btn-sm" onclick="expandRateSectionAndAddRow()">
+            <i data-icon="add" class="icon-sm"></i>
+            <span>Thêm giờ</span>
+          </button>
+        </div>
+      </div>
+      <div class="collapse-body">
+        <div id="rateConfigList" class="rate-list"></div>
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-top:10px;">
+      <label class="field-label">Lịch học cố định hàng tuần:</label>
+      <div id="weekdayConfigGrid" class="weekday-grid"></div>
+    </div>
+
+    <div style="margin-top:18px; display:flex; justify-content:flex-end; gap:10px; padding-top:12px; border-top:1px solid #e2e8f0;">
+      <button type="button" class="btn btn-outline" onclick="closeStudentModal()">Hủy</button>
+      <button type="button" class="btn btn-primary" onclick="saveStudent()">
+        <i data-icon="save" class="icon-sm"></i>
+        <span>Lưu</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- POP-UP MODAL ĐỒNG BỘ DỮ LIỆU ĐÁM MÂY (IPHONE ↔ MÁY TÍNH) -->
+<div class="modal-backdrop" id="cloudSyncModal" onclick="onBackdropClick(event, 'cloudSyncModal')">
+  <div class="modal-box modal-sm" role="dialog" aria-modal="true">
+    <div class="card-header" style="margin-bottom:12px;">
+      <div class="card-title">
+        <i data-icon="sync" style="color:var(--primary);"></i>
+        <span>Đồng bộ iPhone ↔ Máy tính</span>
+      </div>
+      <button type="button" class="btn btn-outline btn-icon-only" onclick="closeCloudSyncModal()">
+        <i data-icon="close" class="icon-sm"></i>
+      </button>
+    </div>
+
+    <div style="font-size:13px; color:var(--muted); margin-bottom:12px; line-height:1.5;">
+      Nhập <b>GitHub Personal Access Token</b> (quyền <code>gist</code>) để tự động đồng bộ dữ liệu thời gian thực giữa iPhone và Máy tính.
+      <a href="https://github.com/settings/tokens/new?description=QuanLyDayThemSync&scopes=gist" target="_blank" style="color:var(--primary); font-weight:700; text-decoration:none;">Lấy Token tại đây ↗</a>
+    </div>
+
+    <div class="form-group">
+      <label class="field-label" for="syncTokenInput">GitHub Token (ghp_...):</label>
+      <input type="password" id="syncTokenInput" placeholder="Dán mã ghp_... vào đây">
+    </div>
+
+    <div id="magicLinkBox" style="display:none; background:#f8fafc; border:1px dashed var(--primary); padding:12px; border-radius:8px; margin-bottom:12px; text-align:center;">
+      <div style="font-size:12.5px; font-weight:700; color:#1e3a8a; margin-bottom:8px;">
+        Quét mã QR bằng Camera iPhone để tự động kết nối đồng bộ:
+      </div>
+      <img id="syncQrImg" alt="QR Sync" style="width:165px; height:165px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:8px;">
+      <div>
+        <button type="button" class="btn btn-outline btn-sm" onclick="copyMagicSyncLink()">
+          <i data-icon="content_copy" class="icon-sm"></i>
+          <span>Copy Link kết nối nhanh cho iPhone</span>
+        </button>
+      </div>
+    </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding-top:12px; border-top:1px solid #e2e8f0;">
+      <button type="button" class="btn btn-danger btn-sm" onclick="disconnectCloudSync()">Ngắt kết nối</button>
+      <div style="display:flex; gap:8px;">
+        <button type="button" class="btn btn-outline" onclick="closeCloudSyncModal()">Đóng</button>
+        <button type="button" class="btn btn-primary" onclick="connectAndSyncCloud()">
+          <i data-icon="save" class="icon-sm"></i>
+          <span>Kết nối & Đồng bộ</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL XÁC NHẬN DÙNG CHUNG -->
+<div class="modal-backdrop" id="commonConfirmModal" onclick="onBackdropClick(event, 'commonConfirmModal')">
+  <div class="modal-box modal-sm" role="alertdialog" aria-modal="true">
+    <div style="display:flex; align-items:center; gap:8px; color:var(--warning); font-weight:700; font-size:16px; margin-bottom:10px;">
+      <i data-icon="warning"></i>
+      <span id="confirmModalTitle">Xác nhận thao tác</span>
+    </div>
+    <p id="confirmModalMessage" style="font-size:14px; color:#334155; margin-bottom:18px;"></p>
+    <div style="display:flex; justify-content:flex-end; gap:8px;">
+      <button type="button" class="btn btn-outline" onclick="handleConfirmModal(false)">Hủy</button>
+      <button type="button" class="btn btn-primary" id="confirmModalAcceptBtn" onclick="handleConfirmModal(true)">Đồng ý</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite">
+  <span id="toastIconWrap"></span>
+  <span id="toastText">Thông báo</span>
+</div>
+
+<script>
+  // ================= BỘ ICON GOOGLE MATERIAL INLINE SVG (KHÔNG BAO GIỜ LỖI TRÊN IPHONE) =================
+  var SVG_PATHS = {
+    school: '<path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3 1 9l11 6 9-4.91V17h2V9L12 3z"/>',
+    fact_check: '<path d="M20 3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14H5v-2h6v2zm0-4H5v-2h6v2zm0-4H5V7h6v2zm3.82 6L12 12.16l1.41-1.41 1.41 1.42L17.99 9l1.42 1.42L14.82 15z"/>',
+    payments: '<path d="M19 14V6c0-1.1-.9-2-2-2H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zm-9-1c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm13-6v11c0 1.1-.9 2-2 2H4v-2h17V7h2z"/>',
+    manage_accounts: '<path d="M10 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h9.5v-2.09c-.47-.83-.5-1.91-.5-1.91H10zm9.43 4.02c.36-.24.57-.64.57-1.07v-.9c0-.43-.21-.83-.57-1.07l-1.07-.71c.04-.32.04-.64 0-.96l1.07-.71c.36-.24.57-.64.57-1.07v-.9c0-.43-.21-.83-.57-1.07l-1.54-1.03c-.36-.24-.82-.28-1.22-.1l-1.18.53c-.5-.38-1.05-.69-1.65-.92l-.25-1.26c-.09-.42-.46-.72-.89-.72h-1.8c-.43 0-.8.3-.89.72l-.25 1.26c-.6.23-1.15.54-1.65.92l-1.18-.53c-.4-.18-.86-.14-1.22.1l-1.54 1.03c-.36.24-.57.64-.57 1.07v.9c0 .43.21.83.57 1.07l1.07.71c-.04.32-.04.64 0 .96l-1.07.71c-.36.24-.57.64-.57 1.07v.9c0 .43.21.83.57 1.07l1.54 1.03c.36.24.82.28 1.22.1l1.18-.53c.5.38 1.05.69 1.65.92l.25 1.26c.09.42.46.72.89.72h1.8c.43 0 .8-.3.89-.72l.25-1.26c.6-.23 1.15-.54 1.65-.92l1.18.53c.4.18.86.14 1.22-.1l1.54-1.03zM16 18c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>',
+    more_horiz: '<path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>',
+    download: '<path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>',
+    upload_file: '<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11 8 15.01z"/>',
+    table_view: '<path d="M19 7H9c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zm0 2v2H9V9h10zm-6 6v-2h2v2h-2zm2 2v2h-2v-2h2zm-4-2H9v-2h2v2zm6-2h2v2h-2v-2zm-8 4h2v2H9v-2zm8 2v-2h2v2h-2zM6 17H5c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2v1h-2V5H5v10h1v2z"/>',
+    chevron_left: '<path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>',
+    chevron_right: '<path d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>',
+    skip_next: '<path d="m6 18 8.5-6L6 6v12zM16 6v12h2V6h-2z"/>',
+    calendar_month: '<path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/>',
+    calendar_view_month: '<path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM8 11H4V6h4v5zm6 0h-4V6h4v5zm6 0h-4V6h4v5zM8 18H4v-5h4v5zm6 0h-4v-5h4v5zm6 0h-4v-5h4v5z"/>',
+    view_list: '<path d="M3 14h4v-4H3v4zm0 5h4v-4H3v4zM3 9h4V5H3v4zm5 5h13v-4H8v4zm0 5h13v-4H8v4zM8 5v4h13V5H8z"/>',
+    add_circle: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>',
+    add: '<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>',
+    restart_alt: '<path d="M12 5V2L8 6l4 4V7c3.31 0 6 2.69 6 6 0 2.97-2.17 5.43-5 5.91v2.02c3.95-.49 7-3.85 7-7.93 0-4.42-3.58-8-8-8zm-6 8c0-1.65.67-3.15 1.76-4.24L6.34 7.34C4.9 8.79 4 10.79 4 13c0 4.08 3.05 7.44 7 7.93v-2.02c-2.83-.48-5-2.94-5-5.91z"/>',
+    edit_calendar: '<path d="M5 10h14V6H5v4zm14-6h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h7v-2H5V12h14v2h2V6c0-1.1-.9-2-2-2zm-.71 12.71-2.12-2.12c-.2-.2-.45-.29-.71-.29s-.51.1-.71.29l-4.75 4.75V22h2.83l4.75-4.75c.39-.39.39-1.02 0-1.41z"/>',
+    chat: '<path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>',
+    content_copy: '<path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>',
+    group: '<path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>',
+    person_add: '<path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>',
+    close: '<path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>',
+    expand_more: '<path d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"/>',
+    expand_less: '<path d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"/>',
+    save: '<path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>',
+    warning: '<path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>',
+    check_circle: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>',
+    radio_button_unchecked: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>',
+    delete: '<path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>',
+    edit: '<path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>',
+    edit_square: '<path d="M5 19h1.41l9.34-9.34-1.41-1.41L5 17.59V19zm16 2H3V3h10l-2 2H5v14h14v-6l2-2v10zm-2.59-13.59L17 6l1.41-1.41c.39-.39 1.02-.39 1.41 0s.39 1.02 0 1.41L18.41 7.41z"/>',
+    history: '<path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>',
+    task_alt: '<path d="M22 5.18 10.59 16.6l-4.24-4.24 1.41-1.41 2.83 2.83 10-10L22 5.18zm-2.21 5.04c.13.57.21 1.17.21 1.78 0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8c1.58 0 3.04.46 4.28 1.25l1.44-1.44C16.1 2.67 14.13 2 12 2 6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10c0-1.19-.22-2.33-.6-3.39l-1.61 1.61z"/>',
+    error: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>',
+    remove_circle: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z"/>',
+    event_busy: '<path d="M9.31 17l2.44-2.44L14.19 17l1.06-1.06-2.44-2.44 2.44-2.44L14.19 10l-2.44 2.44L9.31 10l-1.06 1.06 2.44 2.44-2.44 2.44L9.31 17zM19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/>',
+    published_with_changes: '<path d="M17.66 9.53l-7.07 7.07-4.24-4.24 1.41-1.41 2.83 2.83 5.66-5.66 1.41 1.41zM4 12c0-2.33 1.02-4.42 2.62-5.88L9 8.5v-6H3l2.2 2.2C3.24 6.52 2 9.11 2 12c0 5.19 3.95 9.45 9 9.95v-2.02c-3.94-.49-7-3.86-7-7.93zm18 0c0-5.19-3.95-9.45-9-9.95v2.02c3.94.49 7 3.86 7 7.93 0 2.33-1.02 4.42-2.62 5.88L15 15.5v6h6l-2.2-2.2c1.96-1.82 3.2-4.41 3.2-7.3z"/>',
+    add_task: '<path d="M22 5.18 10.59 16.6l-4.24-4.24 1.41-1.41 2.83 2.83 10-10L22 5.18zM19.79 10.22C19.92 10.79 20 11.39 20 12c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8c1.58 0 3.04.46 4.28 1.25l1.44-1.44C16.1 2.67 14.13 2 12 2 6.48 2 2 6.48 2 12s4.48 10 10 10c1.73 0 3.36-.44 4.78-1.22v-2.43c-1.4.85-3.03 1.65-4.78 1.65zm-.79 4.78v-3h-2v3h-3v2h3v3h2v-3h3v-2h-3z"/>',
+    cloud_done: '<path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM10 17l-3.5-3.5 1.41-1.41L10 14.17 15.18 9l1.41 1.41L10 17z"/>',
+    cloud_off: '<path d="M19.35 10.04C18.67 6.59 15.64 4 12 4c-1.48 0-2.85.43-4.01 1.17l1.46 1.46C10.21 6.23 11.08 6 12 6c3.04 0 5.5 2.46 5.5 5.5v.5H19c1.66 0 3 1.34 3 3 0 1.13-.64 2.11-1.56 2.62l1.45 1.45C23.16 18.16 24 16.68 24 15c0-2.64-2.05-4.78-4.65-4.96zM3 5.27l2.75 2.74C2.56 8.15 0 10.77 0 14c0 3.31 2.69 6 6 6h11.73l2 2L21 20.73 4.27 4 3 5.27zM7.73 10l8 8H6c-2.21 0-4-1.79-4-4s1.79-4 4-4h1.73z"/>',
+    sync: '<path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>'
+  };
+
+  function svgIcon(name, extraClass, styleStr) {
+    var path = SVG_PATHS[name] || SVG_PATHS.check_circle;
+    var cls = 'g-icon' + (extraClass ? ' ' + extraClass : '');
+    var st = styleStr ? ' style="' + styleStr + '"' : '';
+    return '<svg class="' + cls + '" viewBox="0 0 24 24"' + st + ' aria-hidden="true">' + path + '</svg>';
+  }
+
+  function hydrateStaticIcons() {
+    var els = document.querySelectorAll('i[data-icon]');
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i];
+      var name = el.getAttribute('data-icon');
+      var cls = el.className || '';
+      var st = el.getAttribute('style') || '';
+      el.outerHTML = svgIcon(name, cls, st);
+    }
+  }
+
+  // ================= DỮ LIỆU & CẤU HÌNH ĐỒNG BỘ =================
+  var STORAGE_KEY = 'TUTOR_APP_PRODUCTION_V6';
+  var SYNC_CFG_KEY = 'TUTOR_APP_CLOUD_SYNC_CFG';
+  var GIST_FILENAME = 'tutor_app_sync_db.json';
+
+  var DEFAULT_RATES = [{ label: '1h30', price: 450000 }, { label: '2h', price: 500000 }];
+  var DEFAULT_DURATION_LABEL = '2h';
+  var WEEKDAYS = [
+    { day: 1, name: 'Thứ 2' }, { day: 2, name: 'Thứ 3' }, { day: 3, name: 'Thứ 4' },
+    { day: 4, name: 'Thứ 5' }, { day: 5, name: 'Thứ 6' }, { day: 6, name: 'Thứ 7' }, { day: 0, name: 'Chủ Nhật' }
+  ];
+
+  var appData = { students: [], monthlyLogs: {}, monthlyOptions: {}, updatedAt: 0 };
+  var syncConfig = { token: '', gistId: '' };
+  var rateRowCounter = 0;
+  var scheduleViewMode = 'calendar';
+  var pendingConfirmAction = null;
+  var pendingCancelAction = null;
+
+  function formatMoney(num) {
+    var clean = Math.max(0, Math.round(Number(num) || 0));
+    return String(clean).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+  function parseRawMoney(val) {
+    if (typeof val === 'number') return Math.max(0, Math.round(val));
+    var d = String(val || '').replace(/[^0-9]/g, '');
+    return d ? parseInt(d, 10) : 0;
+  }
+  function onMoneyInputKeyup(el) { el.value = formatMoney(parseRawMoney(el.value)); }
+  function capitalizeFirst(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+
+  function getTodayDateStr() {
+    var now = new Date();
+    var mm = String(now.getMonth() + 1);
+    var dd = String(now.getDate());
+    return now.getFullYear() + '-' + (mm.length < 2 ? '0' + mm : mm) + '-' + (dd.length < 2 ? '0' + dd : dd);
+  }
+  function getCurrentMonthStr() { return getTodayDateStr().slice(0, 7); }
+  function getSelectedMonthStr() {
+    var el = document.getElementById('billingMonthInput');
+    if (el && el.value && el.value.indexOf('-') !== -1) return el.value;
+    var cur = getCurrentMonthStr();
+    if (el) el.value = cur;
+    return cur;
+  }
+  function getNextMonthStr(monthStr) {
+    var p = monthStr.split('-');
+    var y = Number(p[0]), m = Number(p[1]) + 1;
+    if (m > 12) { m = 1; y += 1; }
+    return y + '-' + (m < 10 ? '0' + m : String(m));
+  }
+  function isPastMonth(monthStr) { return (monthStr || getSelectedMonthStr()) < getCurrentMonthStr(); }
+
+  function stepMonth(delta) {
+    var cur = getSelectedMonthStr().split('-');
+    var y = Number(cur[0]), m = Number(cur[1]) + delta;
+    if (m <= 0) { m = 12; y -= 1; }
+    else if (m > 12) { m = 1; y += 1; }
+    document.getElementById('billingMonthInput').value = y + '-' + (m < 10 ? '0' + m : String(m));
+    onStudentOrMonthChange();
+  }
+  function jumpToCurrentMonth() {
+    document.getElementById('billingMonthInput').value = getCurrentMonthStr();
+    onStudentOrMonthChange();
+  }
+
+  function showToast(msg, iconName) {
+    var t = document.getElementById('toast');
+    document.getElementById('toastIconWrap').innerHTML = svgIcon(iconName || 'check_circle');
+    document.getElementById('toastText').textContent = msg;
+    t.className = 'toast show';
+    clearTimeout(window.__toastTimer);
+    window.__toastTimer = setTimeout(function() { t.className = 'toast'; }, 2400);
+  }
+
+  function askConfirm(title, message, onConfirm, onCancel) {
+    document.getElementById('confirmModalTitle').textContent = title;
+    document.getElementById('confirmModalMessage').textContent = message;
+    pendingConfirmAction = onConfirm || null;
+    pendingCancelAction = onCancel || null;
+    document.getElementById('commonConfirmModal').classList.add('open');
+    setTimeout(function() { document.getElementById('confirmModalAcceptBtn').focus(); }, 40);
+  }
+  function handleConfirmModal(isConfirmed) {
+    document.getElementById('commonConfirmModal').classList.remove('open');
+    if (isConfirmed && typeof pendingConfirmAction === 'function') pendingConfirmAction();
+    else if (!isConfirmed && typeof pendingCancelAction === 'function') pendingCancelAction();
+    pendingConfirmAction = null;
+    pendingCancelAction = null;
+  }
+
+  function onBackdropClick(e, modalId) {
+    if (e.target && e.target.id === modalId) {
+      if (modalId === 'commonConfirmModal') handleConfirmModal(false);
+      else if (modalId === 'studentModal') closeStudentModal();
+      else if (modalId === 'cloudSyncModal') closeCloudSyncModal();
+    }
+  }
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (document.getElementById('commonConfirmModal').classList.contains('open')) handleConfirmModal(false);
+      else if (document.getElementById('studentModal').classList.contains('open')) closeStudentModal();
+      else if (document.getElementById('cloudSyncModal').classList.contains('open')) closeCloudSyncModal();
+      closeActionMenu();
+    }
+  });
+
+  function guardPastMonthAction(actionLabel, onProceed, onRevert) {
+    var selMonth = getSelectedMonthStr();
+    if (isPastMonth(selMonth)) {
+      var p = selMonth.split('-');
+      askConfirm(
+        'Xác nhận chỉnh sửa tháng cũ',
+        'Bạn đang thực hiện "' + actionLabel + '" ở tháng ' + p[1] + '/' + p[0] + ' (tháng trước tháng hiện tại). Bạn có chắc chắn muốn tiếp tục?',
+        onProceed,
+        onRevert
+      );
+    } else {
+      onProceed();
+    }
+  }
+
+  function toggleActionMenu(e) {
+    e.stopPropagation();
+    document.getElementById('actionDropdown').classList.toggle('open');
+  }
+  function closeActionMenu() { document.getElementById('actionDropdown').classList.remove('open'); }
+  document.addEventListener('click', function() { closeActionMenu(); });
+
+  function switchTab(tab) {
+    var map = { checkin: 'rad_tab_checkin', billing: 'rad_tab_billing', students: 'rad_tab_students' };
+    var targetId = map[tab] || 'rad_tab_checkin';
+    document.getElementById(targetId).checked = true;
+    if (tab === 'checkin') renderCheckinScreen();
+    else if (tab === 'billing') onStudentOrMonthChange();
+  }
+
+  function setScheduleViewMode(mode) {
+    scheduleViewMode = mode;
+    document.getElementById('btnViewCalendar').classList.toggle('active', mode === 'calendar');
+    document.getElementById('btnViewList').classList.toggle('active', mode === 'list');
+    document.getElementById('scheduleCalendarContainer').style.display = mode === 'calendar' ? 'block' : 'none';
+    document.getElementById('scheduleListContainer').style.display = mode === 'list' ? 'block' : 'none';
+    renderScheduleViews();
+  }
+
+  function getWeekdayNameFromDateStr(dStr) {
+    if (!dStr) return '';
+    var p = dStr.split('-');
+    if (p.length !== 3) return '';
+    var dayNum = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2])).getDay();
+    for (var i = 0; i < WEEKDAYS.length; i++) if (WEEKDAYS[i].day === dayNum) return WEEKDAYS[i].name;
+    return '';
+  }
+  function formatShortDate(dStr) {
+    if (!dStr) return '';
+    var p = dStr.split('-');
+    return p.length === 3 ? (p[2] + '/' + p[1]) : dStr;
+  }
+
+  // ================= LƯU TRỮ & ĐỒNG BỘ CLOUD (IPHONE ↔ MÁY TÍNH) =================
+  function saveStorage(skipCloudPush) {
+    appData.updatedAt = Date.now();
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); } catch (e) {}
+    if (!skipCloudPush && syncConfig.token) {
+      clearTimeout(window.__cloudPushTimer);
+      window.__cloudPushTimer = setTimeout(function() { pushToCloud(); }, 600);
+    }
+  }
+
+  function loadStorage() {
+    try {
+      var rawCfg = localStorage.getItem(SYNC_CFG_KEY);
+      if (rawCfg) syncConfig = JSON.parse(rawCfg) || { token: '', gistId: '' };
+    } catch (e) {}
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (parsed && Array.isArray(parsed.students)) {
+          if (!parsed.monthlyLogs) parsed.monthlyLogs = {};
+          if (!parsed.monthlyOptions) parsed.monthlyOptions = {};
+          appData = parsed;
+          return true;
+        }
+      }
+    } catch (e) {}
+    return false;
+  }
+
+  function updateSyncHeaderUI(state, label) {
+    var btn = document.getElementById('cloudSyncHeaderBtn');
+    var quickBtn = document.getElementById('btnQuickPullCloud');
+    if (!syncConfig.token) {
+      btn.className = 'btn btn-outline sync-btn';
+      btn.innerHTML = svgIcon('cloud_off', 'icon-sm') + '<span>Đồng bộ</span>';
+      if (quickBtn) quickBtn.style.display = 'none';
+      return;
+    }
+    if (quickBtn) quickBtn.style.display = 'inline-flex';
+    if (state === 'syncing') {
+      btn.className = 'btn btn-outline sync-btn syncing';
+      btn.innerHTML = svgIcon('sync', 'icon-sm') + '<span>' + (label || 'Đang đồng bộ...') + '</span>';
+    } else {
+      btn.className = 'btn btn-outline sync-btn synced';
+      btn.innerHTML = svgIcon('cloud_done', 'icon-sm') + '<span>' + (label || 'Đã đồng bộ') + '</span>';
+    }
+  }
+
+  function openCloudSyncModal() {
+    document.getElementById('syncTokenInput').value = syncConfig.token || '';
+    updateMagicLinkDisplay();
+    document.getElementById('cloudSyncModal').classList.add('open');
+  }
+  function closeCloudSyncModal() {
+    document.getElementById('cloudSyncModal').classList.remove('open');
+  }
+
+  function updateMagicLinkDisplay() {
+    var box = document.getElementById('magicLinkBox');
+    if (syncConfig.token && syncConfig.gistId) {
+      var baseUrl = window.location.href.split('#')[0];
+      var magicUrl = baseUrl + '#sync=' + encodeURIComponent(syncConfig.token + '|' + syncConfig.gistId);
+      document.getElementById('syncQrImg').src = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + encodeURIComponent(magicUrl);
+      box.style.display = 'block';
+    } else {
+      box.style.display = 'none';
+    }
+  }
+
+  function copyMagicSyncLink() {
+    var baseUrl = window.location.href.split('#')[0];
+    var magicUrl = baseUrl + '#sync=' + encodeURIComponent(syncConfig.token + '|' + syncConfig.gistId);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(magicUrl).then(function() {
+        showToast('Đã copy Link kết nối nhanh cho iPhone!', 'content_copy');
+      });
+    }
+  }
+
+  function disconnectCloudSync() {
+    syncConfig = { token: '', gistId: '' };
+    try { localStorage.removeItem(SYNC_CFG_KEY); } catch (e) {}
+    updateSyncHeaderUI();
+    updateMagicLinkDisplay();
+    closeCloudSyncModal();
+    showToast('Đã ngắt kết nối đồng bộ đám mây', 'cloud_off');
+  }
+
+  function connectAndSyncCloud() {
+    var token = document.getElementById('syncTokenInput').value.trim();
+    if (!token) { showToast('Vui lòng dán mã GitHub Token!', 'warning'); return; }
+    syncConfig.token = token;
+    updateSyncHeaderUI('syncing', 'Đang kết nối...');
+
+    fetch('https://api.github.com/gists?per_page=100', {
+      headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
+    })
+    .then(function(res) {
+      if (!res.ok) throw new Error('Token không hợp lệ hoặc thiếu quyền gist');
+      return res.json();
+    })
+    .then(function(gists) {
+      var foundGist = null;
+      for (var i = 0; i < gists.length; i++) {
+        if (gists[i].files && gists[i].files[GIST_FILENAME]) {
+          foundGist = gists[i];
+          break;
+        }
+      }
+      if (foundGist) {
+        syncConfig.gistId = foundGist.id;
+        localStorage.setItem(SYNC_CFG_KEY, JSON.stringify(syncConfig));
+        updateMagicLinkDisplay();
+        return pullFromCloud(true);
+      } else {
+        var filesObj = {};
+        filesObj[GIST_FILENAME] = { content: JSON.stringify(appData, null, 2) };
+        return fetch('https://api.github.com/gists', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'token ' + token,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ description: 'Database 동 bộ Quản Lý Dạy Thêm (iPhone & PC)', public: false, files: filesObj })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(created) {
+          syncConfig.gistId = created.id;
+          localStorage.setItem(SYNC_CFG_KEY, JSON.stringify(syncConfig));
+          updateSyncHeaderUI('synced', 'Đã đồng bộ');
+          updateMagicLinkDisplay();
+          showToast('Đã khởi tạo đám mây đồng bộ thành công!', 'cloud_done');
+        });
+      }
+    })
+    .catch(function(err) {
+      updateSyncHeaderUI();
+      showToast('Lỗi kết nối: ' + err.message, 'warning');
+    });
+  }
+
+  function pushToCloud() {
+    if (!syncConfig.token || !syncConfig.gistId) return;
+    updateSyncHeaderUI('syncing', 'Đang lưu Cloud...');
+    var filesObj = {};
+    filesObj[GIST_FILENAME] = { content: JSON.stringify(appData, null, 2) };
+    fetch('https://api.github.com/gists/' + syncConfig.gistId, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': 'token ' + syncConfig.token,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ files: filesObj })
+    })
+    .then(function(res) {
+      if (res.ok) updateSyncHeaderUI('synced', 'Đã đồng bộ');
+    })
+    .catch(function() {});
+  }
+
+  function pullFromCloud(showNotification) {
+    if (!syncConfig.token || !syncConfig.gistId) return Promise.resolve();
+    updateSyncHeaderUI('syncing', 'Đang tải...');
+    return fetch('https://api.github.com/gists/' + syncConfig.gistId + '?t=' + Date.now(), {
+      headers: { 'Authorization': 'token ' + syncConfig.token, 'Accept': 'application/vnd.github.v3+json' }
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(gist) {
+      if (gist && gist.files && gist.files[GIST_FILENAME] && gist.files[GIST_FILENAME].content) {
+        var remoteData = JSON.parse(gist.files[GIST_FILENAME].content);
+        if (remoteData && Array.isArray(remoteData.students)) {
+          // Nếu máy local đang trống học viên nhưng có dữ liệu local nhiều hơn và remote rỗng thì đẩy local lên
+          if (remoteData.students.length === 0 && appData.students.length > 0) {
+            pushToCloud();
+          } else {
+            if (!remoteData.monthlyLogs) remoteData.monthlyLogs = {};
+            if (!remoteData.monthlyOptions) remoteData.monthlyOptions = {};
+            appData = remoteData;
+            saveStorage(true);
+            refreshAllUI();
+          }
+        }
+      }
+      updateSyncHeaderUI('synced', 'Đã đồng bộ');
+      if (showNotification) showToast('Đã đồng bộ dữ liệu mới nhất từ đám mây!', 'cloud_done');
+    })
+    .catch(function() {
+      updateSyncHeaderUI('synced', 'Lỗi mạng');
+    });
+  }
+
+  // Tự động đồng bộ khi mở lại màn hình trên iPhone hoặc chuyển tab trình duyệt
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'visible' && syncConfig.token && syncConfig.gistId) {
+      pullFromCloud(false);
+    }
+  });
+
+  // ================= LOGIC LỊCH HỌC & CHECK-IN =================
+  function getMonthOptions(stuId, monthStr) {
+    if (!stuId || !monthStr) return { deductUncompensated: false, deductCurrentAbsent: false, showDates: true };
+    var key = stuId + '_' + monthStr;
+    if (!appData.monthlyOptions) appData.monthlyOptions = {};
+    if (!appData.monthlyOptions[key]) {
+      appData.monthlyOptions[key] = { deductUncompensated: false, deductCurrentAbsent: false, showDates: true };
+    }
+    return appData.monthlyOptions[key];
+  }
+
+  function getDefaultRateObj(rates) {
+    var list = (rates && rates.length > 0) ? rates : DEFAULT_RATES;
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i].label).toLowerCase() === DEFAULT_DURATION_LABEL) return list[i];
+    }
+    return list[0];
+  }
+
+  function buildDefaultSessionsForMonth(student, monthStr) {
+    if (!student || !monthStr) return [];
+    var p = monthStr.split('-');
+    var year = Number(p[0]), month = Number(p[1]);
+    var daysInMonth = new Date(year, month, 0).getDate();
+    var sessions = [];
+    var rates = (student.rates && student.rates.length > 0) ? student.rates : DEFAULT_RATES;
+    var schedule = student.weeklySchedule || [];
+
+    for (var d = 1; d <= daysInMonth; d++) {
+      var dayOfWeek = new Date(year, month - 1, d).getDay();
+      var matched = null;
+      for (var i = 0; i < schedule.length; i++) {
+        if (Number(schedule[i].day) === dayOfWeek) { matched = schedule[i]; break; }
+      }
+      if (matched) {
+        var dd = d < 10 ? '0' + d : String(d);
+        var mm = month < 10 ? '0' + month : String(month);
+        var rateObj = getDefaultRateObj(rates);
+        for (var j = 0; j < rates.length; j++) {
+          if (rates[j].label === matched.duration) { rateObj = rates[j]; break; }
+        }
+        sessions.push({
+          date: year + '-' + mm + '-' + dd,
+          duration: rateObj.label,
+          price: Number(rateObj.price),
+          status: 'normal',
+          isDefault: true,
+          checkedIn: false
+        });
+      }
+    }
+    return sessions;
+  }
+
+  function ensureMonthInitialized(student, monthStr) {
+    if (!student || !monthStr) return [];
+    var key = student.id + '_' + monthStr;
+    if (!appData.monthlyLogs[key] || !Array.isArray(appData.monthlyLogs[key])) {
+      appData.monthlyLogs[key] = buildDefaultSessionsForMonth(student, monthStr);
+    }
+    return appData.monthlyLogs[key];
+  }
+
+  // ================= MÀN HÌNH 0: CHECK-IN HÔM NAY =================
+  function renderCheckinScreen() {
+    var todayStr = getTodayDateStr();
+    var currentMonth = getCurrentMonthStr();
+    var wdToday = getWeekdayNameFromDateStr(todayStr);
+    document.getElementById('checkinHeaderTitle').textContent =
+      'Check-in hôm nay — ' + wdToday + ', ' + formatShortDate(todayStr) + '/' + todayStr.slice(0, 4);
+
+    var container = document.getElementById('checkinContentArea');
+    if (!appData.students || appData.students.length === 0) {
+      container.innerHTML =
+        '<div style="text-align:center; padding:32px 16px; color:var(--muted);">' +
+          '<p style="margin-bottom:12px;">Chưa có dữ liệu học viên nào trong hệ thống.</p>' +
+          '<button type="button" class="btn btn-primary" onclick="switchTab(\'students\'); openAddStudentModal();">' +
+            svgIcon('person_add', 'icon-sm') + '<span>Thêm học viên đầu tiên</span>' +
+          '</button>' +
+        '</div>';
+      return;
+    }
+
+    var scheduledTodayList = [];
+    var otherStudentsList = [];
+    var checkedInCountToday = 0;
+
+    for (var i = 0; i < appData.students.length; i++) {
+      var stu = appData.students[i];
+      var logs = ensureMonthInitialized(stu, currentMonth);
+
+      // Kiểm tra các buổi trong ngày hôm nay của học viên
+      var todaySessionIdx = -1;
+      var alreadyCheckedInToday = false;
+      for (var j = 0; j < logs.length; j++) {
+        if (logs[j].date === todayStr) {
+          if (logs[j].checkedIn) {
+            alreadyCheckedInToday = true;
+            break;
+          }
+          if (logs[j].status !== 'absent') {
+            todaySessionIdx = j;
+          }
+        }
+      }
+
+      // Nếu học viên đã được check-in hôm nay -> Ẩn khỏi màn hình Check-in
+      if (alreadyCheckedInToday) {
+        checkedInCountToday++;
+        continue;
+      }
+
+      if (todaySessionIdx !== -1) {
+        scheduledTodayList.push({ stu: stu, sessionIdx: todaySessionIdx, session: logs[todaySessionIdx] });
+      } else {
+        otherStudentsList.push({ stu: stu, sessionIdx: -1, session: null });
+      }
+    }
+
+    var html = '';
+
+    if (scheduledTodayList.length === 0 && otherStudentsList.length === 0) {
+      html +=
+        '<div style="text-align:center; padding:30px 16px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; color:var(--success);">' +
+          svgIcon('task_alt', 'icon-lg') +
+          '<div style="font-weight:800; font-size:16px; margin-top:6px;">Tất cả học viên đã hoàn tất Check-in hôm nay!</div>' +
+          '<div style="font-size:13px; margin-top:4px;">Bạn có thể xem lại hoặc bỏ tick Check-in tại tab <b>Học phí</b>.</div>' +
+        '</div>';
+      container.innerHTML = html;
+      return;
+    }
+
+    // 1. NHÓM ƯU TIÊN: HỌC VIÊN CÓ LỊCH HỌC HÔM NAY
+    html += '<div class="section-sub-label">' + svgIcon('calendar_month', 'icon-sm', 'color:var(--primary);') + '<span>Học viên có lịch học hôm nay (' + scheduledTodayList.length + ')</span></div>';
+    if (scheduledTodayList.length === 0) {
+      html += '<div style="padding:14px; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px; font-size:13.5px; color:var(--muted);">Không còn học viên nào có lịch cố định hôm nay chờ check-in.</div>';
+    } else {
+      html += '<div class="checkin-grid">';
+      for (var s = 0; s < scheduledTodayList.length; s++) {
+        html += buildCheckinCardHTML(scheduledTodayList[s].stu, true, scheduledTodayList[s].session);
+      }
+      html += '</div>';
+    }
+
+    // 2. NHÓM HỌC VIÊN KHÁC (ĐỂ CHECK-IN HỌC BÙ / HỌC BỔ SUNG ĐỘT XUẤT)
+    if (otherStudentsList.length > 0) {
+      html += '<div class="section-sub-label" style="margin-top:22px;">' + svgIcon('group', 'icon-sm') + '<span>Học viên khác — Check-in học bù / bổ sung (' + otherStudentsList.length + ')</span></div>';
+      html += '<div class="checkin-grid">';
+      for (var o = 0; o < otherStudentsList.length; o++) {
+        html += buildCheckinCardHTML(otherStudentsList[o].stu, false, null);
+      }
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  function buildCheckinCardHTML(stu, isScheduledToday, existingSession) {
+    var currentMonth = getCurrentMonthStr();
+    var carryOvers = getCarryOverSessions(stu, currentMonth);
+    var uncompCount = 0;
+    for (var c = 0; c < carryOvers.length; c++) if (!carryOvers[c].isCompensated) uncompCount++;
+
+    var defaultDur = existingSession ? existingSession.duration : getDefaultRateObj(stu.rates).label;
+    var rateOpts = '';
+    for (var r = 0; r < stu.rates.length; r++) {
+      var rt = stu.rates[r];
+      rateOpts += '<option value="' + rt.label + '" ' + (rt.label === defaultDur ? 'selected' : '') + '>Ca ' + rt.label + ' (' + formatMoney(rt.price) + 'đ)</option>';
+    }
+
+    var statusOpts = '';
+    if (isScheduledToday) {
+      statusOpts = '<option value="normal" selected>Học theo lịch</option>';
+    } else {
+      var defaultExtraSt = uncompCount > 0 ? 'makeup' : 'extra';
+      statusOpts =
+        '<option value="makeup" ' + (defaultExtraSt === 'makeup' ? 'selected' : '') + '>Học bù' + (uncompCount > 0 ? ' (Nợ ' + uncompCount + 'b)' : '') + '</option>' +
+        '<option value="extra" ' + (defaultExtraSt === 'extra' ? 'selected' : '') + '>Học bổ sung</option>';
+    }
+
+    var badgeHtml = isScheduledToday
+      ? '<span class="badge badge-current">' + svgIcon('check_circle', 'icon-sm') + 'Có lịch hôm nay</span>'
+      : (uncompCount > 0
+          ? '<span class="badge badge-past">Cần bù ' + uncompCount + ' buổi</span>'
+          : '<span class="badge">Ngoài lịch cố định</span>');
+
+    var absentBtnHtml = isScheduledToday
+      ? '<button type="button" class="btn btn-danger" onclick="quickMarkAbsentToday(\'' + stu.id + '\')" title="Báo nghỉ buổi hôm nay">Nghỉ</button>'
+      : '';
+
+    return (
+      '<div class="checkin-card ' + (isScheduledToday ? 'priority-today' : '') + '">' +
+        '<div class="checkin-card-top">' +
+          '<div>' +
+            '<div class="checkin-stu-name">' + stu.name + '</div>' +
+            '<div class="checkin-parent">PH: ' + (stu.parentTitle || 'chị') + ' ' + stu.parentName + '</div>' +
+          '</div>' +
+          badgeHtml +
+        '</div>' +
+        '<div class="checkin-controls">' +
+          '<div>' +
+            '<label style="font-size:11px; color:var(--muted); font-weight:700;">Ca giờ học</label>' +
+            '<select id="chkDur_' + stu.id + '" style="width:100%; margin-top:3px; font-weight:700;">' + rateOpts + '</select>' +
+          '</div>' +
+          '<div>' +
+            '<label style="font-size:11px; color:var(--muted); font-weight:700;">Hình thức</label>' +
+            '<select id="chkStatus_' + stu.id + '" style="width:100%; margin-top:3px;">' + statusOpts + '</select>' +
+          '</div>' +
+        '</div>' +
+        '<div class="checkin-actions">' +
+          '<button type="button" class="btn btn-primary btn-checkin-main" onclick="confirmStudentCheckinToday(\'' + stu.id + '\')">' +
+            svgIcon('task_alt') + '<span>Check-in</span>' +
+          '</button>' +
+          absentBtnHtml +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function confirmStudentCheckinToday(stuId) {
+    var stu = null;
+    for (var i = 0; i < appData.students.length; i++) if (appData.students[i].id === stuId) { stu = appData.students[i]; break; }
+    if (!stu) return;
+
+    var todayStr = getTodayDateStr();
+    var currentMonth = getCurrentMonthStr();
+    var logs = ensureMonthInitialized(stu, currentMonth);
+
+    var durEl = document.getElementById('chkDur_' + stuId);
+    var stEl = document.getElementById('chkStatus_' + stuId);
+    var chosenDur = durEl ? durEl.value : getDefaultRateObj(stu.rates).label;
+    var chosenStatus = stEl ? stEl.value : 'normal';
+
+    var chosenPrice = getDefaultRateObj(stu.rates).price;
+    for (var r = 0; r < stu.rates.length; r++) {
+      if (stu.rates[r].label === chosenDur) { chosenPrice = Number(stu.rates[r].price); break; }
+    }
+
+    // Kiểm tra nếu chọn Học bù nhưng không còn nợ tháng trước
+    if (chosenStatus === 'makeup') {
+      var carryOvers = getCarryOverSessions(stu, currentMonth);
+      var currentMakeups = 0;
+      for (var m = 0; m < logs.length; m++) {
+        if (logs[m].isDefault === false && logs[m].status === 'makeup') currentMakeups++;
+      }
+      if (currentMakeups >= carryOvers.length) chosenStatus = 'extra';
+    }
+
+    var foundTodaySession = null;
+    for (var j = 0; j < logs.length; j++) {
+      if (logs[j].date === todayStr && logs[j].status !== 'absent') {
+        foundTodaySession = logs[j];
+        break;
+      }
+    }
+
+    if (foundTodaySession) {
+      foundTodaySession.duration = chosenDur;
+      foundTodaySession.price = chosenPrice;
+      foundTodaySession.checkedIn = true;
+    } else {
+      logs.push({
+        date: todayStr,
+        duration: chosenDur,
+        price: chosenPrice,
+        status: chosenStatus === 'normal' ? 'extra' : chosenStatus,
+        isDefault: false,
+        checkedIn: true
+      });
+    }
+
+    reconcileSubsequentMonths(stu);
+    saveStorage();
+    refreshAllUI();
+    showToast('Đã Check-in hôm nay cho ' + stu.name + '!', 'task_alt');
+  }
+
+  function quickMarkAbsentToday(stuId) {
+    var stu = null;
+    for (var i = 0; i < appData.students.length; i++) if (appData.students[i].id === stuId) { stu = appData.students[i]; break; }
+    if (!stu) return;
+
+    var todayStr = getTodayDateStr();
+    var currentMonth = getCurrentMonthStr();
+    var logs = ensureMonthInitialized(stu, currentMonth);
+
+    for (var j = 0; j < logs.length; j++) {
+      if (logs[j].date === todayStr) {
+        logs[j].status = 'absent';
+        logs[j].checkedIn = false;
+        break;
+      }
+    }
+    reconcileSubsequentMonths(stu);
+    saveStorage();
+    refreshAllUI();
+    showToast('Đã ghi nhận ' + stu.name + ' nghỉ hôm nay', 'event_busy');
+  }
+
+  // Bổ sung hoặc bỏ phần tick Check-in ở màn hình chi tiết lịch học
+  function toggleSessionCheckin(idx) {
+    var stu = getSelectedStudent();
+    var list = appData.monthlyLogs[getLogKey()];
+    if (!stu || !list || !list[idx]) return;
+
+    var targetSess = list[idx];
+    var nextCheckedState = !targetSess.checkedIn;
+    var actionText = (nextCheckedState ? 'Tick Check-in' : 'Bỏ tick Check-in') + ' ngày ' + formatShortDate(targetSess.date);
+
+    guardPastMonthAction(actionText, function() {
+      targetSess.checkedIn = nextCheckedState;
+      if (nextCheckedState && targetSess.status === 'absent') {
+        targetSess.status = targetSess.isDefault !== false ? 'normal' : 'extra';
+      }
+      saveStorage();
+      refreshAllUI();
+      showToast(nextCheckedState ? 'Đã tick Check-in ngày ' + formatShortDate(targetSess.date) : 'Đã bỏ tick Check-in ngày ' + formatShortDate(targetSess.date), 'fact_check');
+    });
+  }
+
+  // ================= LOGIC TÍNH HỌC PHÍ & CHUYỂN THÁNG =================
+  function getCarryOverSessions(student, targetMonthStr) {
+    if (!student || !targetMonthStr) return [];
+    var stuPrefix = student.id + '_';
+    var allMonthsSet = {};
+    allMonthsSet[targetMonthStr] = true;
+
+    for (var k in appData.monthlyLogs) {
+      if (appData.monthlyLogs.hasOwnProperty(k) && k.indexOf(stuPrefix) === 0) {
+        var m = k.slice(stuPrefix.length);
+        if (m <= targetMonthStr) allMonthsSet[m] = true;
+      }
+    }
+    var months = Object.keys(allMonthsSet).sort();
+    var unsettledQueue = [];
+
+    for (var i = 0; i < months.length; i++) {
+      var mStr = months[i];
+      var logs = appData.monthlyLogs[stuPrefix + mStr] || [];
+      var opts = getMonthOptions(student.id, mStr);
+
+      var makeupList = [];
+      for (var sIdx = 0; sIdx < logs.length; sIdx++) {
+        if (logs[sIdx].isDefault === false && logs[sIdx].status === 'makeup') makeupList.push(logs[sIdx]);
+      }
+
+      if (mStr === targetMonthStr) {
+        var result = [];
+        for (var c = 0; c < unsettledQueue.length; c++) {
+          var matchedMakeup = c < makeupList.length ? makeupList[c] : null;
+          result.push({
+            fromDate: unsettledQueue[c].fromDate,
+            duration: unsettledQueue[c].duration,
+            price: unsettledQueue[c].price,
+            isCompensated: Boolean(matchedMakeup),
+            compensatedDate: matchedMakeup ? matchedMakeup.date : ''
+          });
+        }
+        return result;
+      } else {
+        if (makeupList.length > 0) unsettledQueue.splice(0, makeupList.length);
+        if (opts.deductUncompensated && unsettledQueue.length > 0) unsettledQueue = [];
+        if (!opts.deductCurrentAbsent) {
+          for (var a = 0; a < logs.length; a++) {
+            if (logs[a].isDefault !== false && logs[a].status === 'absent') {
+              unsettledQueue.push({
+                fromDate: logs[a].date,
+                duration: logs[a].duration,
+                price: Number(logs[a].price || 0)
+              });
+            }
+          }
+        }
+      }
+    }
+    return [];
+  }
+
+  function reconcileSubsequentMonths(student) {
+    if (!student) return;
+    var stuPrefix = student.id + '_';
+    var months = [];
+    for (var k in appData.monthlyLogs) {
+      if (appData.monthlyLogs.hasOwnProperty(k) && k.indexOf(stuPrefix) === 0) {
+        months.push(k.slice(stuPrefix.length));
+      }
+    }
+    months.sort();
+    for (var i = 0; i < months.length; i++) {
+      var mStr = months[i];
+      var carryOvers = getCarryOverSessions(student, mStr);
+      var maxMakeupsAllowed = carryOvers.length;
+      var logs = appData.monthlyLogs[stuPrefix + mStr] || [];
+      var makeupSeen = 0;
+      for (var j = 0; j < logs.length; j++) {
+        if (logs[j].isDefault === false && logs[j].status === 'makeup') {
+          makeupSeen++;
+          if (makeupSeen > maxMakeupsAllowed) logs[j].status = 'extra';
+        }
+      }
+      var uncompCount = 0;
+      for (var c = 0; c < carryOvers.length; c++) if (!carryOvers[c].isCompensated) uncompCount++;
+      var opts = getMonthOptions(student.id, mStr);
+      if (uncompCount === 0) opts.deductUncompensated = false;
+    }
+  }
+
+  function getSelectedStudent() {
+    if (!appData.students || appData.students.length === 0) return null;
+    var id = document.getElementById('billingStudentSelect').value;
+    for (var i = 0; i < appData.students.length; i++) if (appData.students[i].id === id) return appData.students[i];
+    return appData.students[0] || null;
+  }
+  function getLogKey() {
+    var stu = getSelectedStudent();
+    return stu ? (stu.id + '_' + getSelectedMonthStr()) : '';
+  }
+
+  function updateMonthStatusBadge(monthStr) {
+    var badge = document.getElementById('monthStatusBadge');
+    var cur = getCurrentMonthStr();
+    if (monthStr < cur) {
+      badge.className = 'badge badge-past';
+      badge.textContent = 'Tháng cũ • Bảo vệ dữ liệu';
+    } else if (monthStr === cur) {
+      badge.className = 'badge badge-current';
+      badge.textContent = 'Tháng hiện tại';
+    } else {
+      badge.className = 'badge badge-blue';
+      badge.textContent = 'Tháng kế tiếp';
+    }
+  }
+
+  function onStudentOrMonthChange() {
+    var stu = getSelectedStudent();
+    var monthStr = getSelectedMonthStr();
+    var mParts = monthStr.split('-');
+    updateMonthStatusBadge(monthStr);
+
+    if (!stu) {
+      document.getElementById('leftPanelTitle').textContent = 'Lịch học chi tiết';
+      document.getElementById('studentRateBanner').innerHTML = 'Chưa có học viên nào. Vui lòng sang tab <b>Học viên</b> để thêm.';
+      document.getElementById('defaultScheduleText').innerHTML = '<b>Lịch cố định hàng tuần:</b> Chưa có học viên';
+      document.getElementById('sessionTableBody').innerHTML = '<tr><td colspan="7" style="text-align:center; padding:24px; color:var(--muted);">Chưa có dữ liệu học viên.</td></tr>';
+      document.getElementById('calendarCarryOverBanner').innerHTML = '';
+      document.getElementById('calendarGrid').innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:24px; color:var(--muted);">Chưa có dữ liệu học viên.</div>';
+      document.getElementById('summaryBreakdown').textContent = 'Tổng số buổi học: 0 buổi';
+      document.getElementById('summarySubDetail').textContent = '';
+      document.getElementById('summaryTotalAmount').textContent = '0 đ';
+      document.getElementById('generatedMessageText').value = '';
+      document.getElementById('chkDeductUncompensated').disabled = true;
+      document.getElementById('chkDeductCurrentAbsent').disabled = true;
+      return;
+    }
+
+    document.getElementById('leftPanelTitle').textContent = 'Lịch học chi tiết (' + mParts[1] + '/' + mParts[0] + ')';
+    var rateArr = [];
+    for (var r = 0; r < stu.rates.length; r++) rateArr.push('Ca ' + stu.rates[r].label + ': ' + formatMoney(stu.rates[r].price) + 'đ');
+    document.getElementById('studentRateBanner').innerHTML =
+      'Phụ huynh: <b>' + (stu.parentTitle || 'chị') + ' ' + stu.parentName + '</b> &nbsp;|&nbsp; Đơn giá: <span style="color:var(--primary); font-weight:700;">' + rateArr.join(' • ') + '</span>';
+
+    var sched = stu.weeklySchedule || [];
+    var schedDesc = [];
+    for (var w = 0; w < sched.length; w++) {
+      var wdName = '';
+      for (var d = 0; d < WEEKDAYS.length; d++) if (WEEKDAYS[d].day === Number(sched[w].day)) { wdName = WEEKDAYS[d].name; break; }
+      schedDesc.push(wdName + ' (' + sched[w].duration + ')');
+    }
+    document.getElementById('defaultScheduleText').innerHTML =
+      '<b>Lịch cố định hàng tuần của ' + stu.name + ':</b> ' + (schedDesc.length > 0 ? schedDesc.join(', ') : 'Chưa chọn thứ cố định');
+
+    ensureMonthInitialized(stu, monthStr);
+    refreshBillingCalculation();
+  }
+
+  function requestToggleMonthOption(optField, checkboxEl) {
+    var stu = getSelectedStudent();
+    if (!stu) return;
+    var monthStr = getSelectedMonthStr();
+    var opts = getMonthOptions(stu.id, monthStr);
+    var newVal = checkboxEl.checked;
+    var labelText = optField === 'deductUncompensated' ? 'Trừ buổi không học bù' : 'Trừ trực tiếp buổi nghỉ tháng này';
+    var p = monthStr.split('-');
+    var nextM = getNextMonthStr(monthStr).split('-');
+
+    askConfirm(
+      'Xác nhận thay đổi tùy chọn',
+      'Bạn có chắc chắn muốn ' + (newVal ? 'BẬT' : 'TẮT') + ' "' + labelText + '" cho tháng ' + p[1] + '/' + p[0] + ' không? Thay đổi này sẽ cập nhật ngay học phí tháng ' + p[1] + '/' + p[0] + ' và đồng bộ dữ liệu sang tháng ' + nextM[1] + '/' + nextM[0] + '.',
+      function() {
+        opts[optField] = newVal;
+        reconcileSubsequentMonths(stu);
+        saveStorage();
+        refreshBillingCalculation();
+        showToast('Đã lưu thiết lập cho tháng ' + p[1] + '/' + p[0]);
+      },
+      function() {
+        checkboxEl.checked = !newVal;
+      }
+    );
+  }
+
+  function onToggleShowDates(val) {
+    var stu = getSelectedStudent();
+    if (!stu) return;
+    var opts = getMonthOptions(stu.id, getSelectedMonthStr());
+    opts.showDates = val;
+    saveStorage();
+    generateMessage();
+  }
+
+  function requestResetMonthToDefault() {
+    var stu = getSelectedStudent();
+    if (!stu) { showToast('Chưa có học viên nào được chọn!', 'warning'); return; }
+    guardPastMonthAction('Reset lịch mặc định', function() {
+      var monthStr = getSelectedMonthStr();
+      appData.monthlyLogs[getLogKey()] = buildDefaultSessionsForMonth(stu, monthStr);
+      reconcileSubsequentMonths(stu);
+      saveStorage();
+      refreshAllUI();
+      showToast('Đã reset lịch mặc định tháng ' + monthStr, 'restart_alt');
+    });
+  }
+
+  function renderScheduleViews() {
+    renderSessionTable();
+    renderCalendarView();
+  }
+
+  function renderSessionTable() {
+    var stu = getSelectedStudent();
+    var monthStr = getSelectedMonthStr();
+    var sessions = appData.monthlyLogs[getLogKey()] || [];
+    var carryOvers = getCarryOverSessions(stu, monthStr);
+    var opts = stu ? getMonthOptions(stu.id, monthStr) : {};
+    var tbody = document.getElementById('sessionTableBody');
+    tbody.innerHTML = '';
+    if (!stu) return;
+
+    if (carryOvers.length === 0 && sessions.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--muted);">Chưa có buổi học nào trong tháng. Bấm <b>"Thêm buổi"</b> để thêm.</td></tr>';
+      return;
+    }
+
+    for (var c = 0; c < carryOvers.length; c++) {
+      var co = carryOvers[c];
+      var trCarry = document.createElement('tr');
+      trCarry.className = co.isCompensated ? 'row-carry-paid' : 'row-carry-unpaid';
+      var wdCarry = getWeekdayNameFromDateStr(co.fromDate);
+      var statusBadgeHtml = co.isCompensated
+        ? svgIcon('task_alt', 'icon-sm', 'color:var(--success);') + ' <b>Đã bù</b> (ngày ' + formatShortDate(co.compensatedDate) + ')'
+        : (opts.deductUncompensated
+            ? svgIcon('remove_circle', 'icon-sm', 'color:var(--danger);') + ' <b>Chưa bù (Đã trừ tiền tháng này)</b>'
+            : svgIcon('error', 'icon-sm', 'color:var(--danger);') + ' <b>Nghỉ tháng trước (Chưa bù)</b>');
+
+      trCarry.innerHTML =
+        '<td style="font-weight:700;">' + svgIcon('history', 'icon-sm') + '</td>' +
+        '<td><div style="display:flex; align-items:center; gap:6px;"><span class="weekday-tag">' + wdCarry + '</span><span>' + formatShortDate(co.fromDate) + ' (Tháng trước)</span></div></td>' +
+        '<td><b>Ca ' + co.duration + '</b></td>' +
+        '<td style="text-align:right; font-weight:700; padding-right:16px;">' + formatMoney(co.price) + '</td>' +
+        '<td><div class="status-cell-wrap">' + statusBadgeHtml + '</div></td>' +
+        '<td style="text-align:center; color:var(--muted);">—</td>' +
+        '<td style="text-align:center; color:var(--muted);">—</td>';
+      tbody.appendChild(trCarry);
+    }
+
+    for (var i = 0; i < sessions.length; i++) {
+      var sess = sessions[i];
+      var isDef = (sess.isDefault !== false);
+      if (!isDef && sess.status !== 'makeup' && sess.status !== 'extra') sess.status = 'makeup';
+      if (isDef && sess.status !== 'normal' && sess.status !== 'absent') sess.status = 'normal';
+
+      var tr = document.createElement('tr');
+      if (isDef && sess.status === 'absent') tr.className = 'row-absent';
+      else if (!isDef && sess.status === 'makeup') tr.className = 'row-makeup';
+      else if (!isDef && sess.status === 'extra') tr.className = 'row-extra';
+
+      var optsHtml = '';
+      for (var r = 0; r < stu.rates.length; r++) {
+        var rate = stu.rates[r];
+        optsHtml += '<option value="' + rate.label + '" ' + (rate.label === sess.duration ? 'selected' : '') + '>' + rate.label + '</option>';
+      }
+
+      var weekdayLabel = getWeekdayNameFromDateStr(sess.date);
+      var isZeroed = (!isDef && sess.status === 'makeup') || (isDef && sess.status === 'absent' && opts.deductCurrentAbsent);
+      var priceCellHtml = isZeroed
+        ? '<input type="text" class="money-input money-readonly" value="0 (' + (!isDef ? 'Cấn trừ' : 'Đã trừ') + ')" readonly style="width:115px; padding:5px 8px;">'
+        : '<input type="text" inputmode="numeric" class="money-input" value="' + formatMoney(sess.price) + '" oninput="onMoneyInputKeyup(this)" onchange="onSessionPriceChange(' + i + ', this.value)" style="width:115px; padding:5px 8px; font-weight:700; color:#1e40af;">';
+
+      var statusSelectHtml = '';
+      var sIcon = 'check_circle', sColor = 'color:var(--success);';
+      if (isDef) {
+        if (sess.status === 'absent') { sIcon = 'event_busy'; sColor = 'color:var(--danger);'; }
+        statusSelectHtml =
+          '<select onchange="onSessionStatusChange(' + i + ', this.value)" style="width:100%; padding:5px;">' +
+            '<option value="normal" ' + (sess.status === 'normal' ? 'selected' : '') + '>Học theo lịch</option>' +
+            '<option value="absent" ' + (sess.status === 'absent' ? 'selected' : '') + '>Nghỉ</option>' +
+          '</select>';
+      } else {
+        if (sess.status === 'makeup') { sIcon = 'published_with_changes'; sColor = 'color:var(--success);'; }
+        else { sIcon = 'add_task'; sColor = 'color:var(--primary);'; }
+        statusSelectHtml =
+          '<select onchange="onSessionStatusChange(' + i + ', this.value)" style="width:100%; padding:5px;">' +
+            '<option value="makeup" ' + (sess.status === 'makeup' ? 'selected' : '') + '>Học bù</option>' +
+            '<option value="extra" ' + (sess.status === 'extra' ? 'selected' : '') + '>Học bổ sung</option>' +
+          '</select>';
+      }
+
+      var isCheckedIn = Boolean(sess.checkedIn);
+      var checkinBtnHtml =
+        '<button type="button" class="chk-in-toggle ' + (isCheckedIn ? 'checked' : '') + '" onclick="toggleSessionCheckin(' + i + ')" title="Bấm để bật/tắt Check-in">' +
+          svgIcon(isCheckedIn ? 'check_circle' : 'radio_button_unchecked', 'icon-sm') +
+          '<span>' + (isCheckedIn ? 'Đã học' : 'Check-in') + '</span>' +
+        '</button>';
+
+      tr.innerHTML =
+        '<td style="font-weight:700; color:var(--muted);">' + (i + 1) + '</td>' +
+        '<td><div style="display:flex; align-items:center; gap:6px;"><span class="weekday-tag">' + weekdayLabel + '</span><input type="date" value="' + sess.date + '" onchange="onSessionDateChange(' + i + ', this.value)" style="width:128px; padding:5px;"></div></td>' +
+        '<td><select onchange="onSessionDurationChange(' + i + ', this.value)" style="width:94px; padding:5px; font-weight:600;">' + optsHtml + '</select></td>' +
+        '<td>' + priceCellHtml + '</td>' +
+        '<td><div class="status-cell-wrap">' + svgIcon(sIcon, '', sColor) + statusSelectHtml + '</div></td>' +
+        '<td style="text-align:center;">' + checkinBtnHtml + '</td>' +
+        '<td style="text-align:center;"><button type="button" class="btn btn-danger btn-sm btn-icon-only" onclick="requestRemoveSessionRow(' + i + ')" title="Xóa buổi này">' + svgIcon('delete') + '</button></td>';
+      tbody.appendChild(tr);
+    }
+  }
+
+  function renderCalendarView() {
+    var stu = getSelectedStudent();
+    var monthStr = getSelectedMonthStr();
+    var todayStr = getTodayDateStr();
+    var bannerEl = document.getElementById('calendarCarryOverBanner');
+    var gridEl = document.getElementById('calendarGrid');
+    bannerEl.innerHTML = '';
+    gridEl.innerHTML = '';
+    if (!stu) return;
+
+    var sessions = appData.monthlyLogs[getLogKey()] || [];
+    var carryOvers = getCarryOverSessions(stu, monthStr);
+    var opts = getMonthOptions(stu.id, monthStr);
+
+    for (var c = 0; c < carryOvers.length; c++) {
+      var co = carryOvers[c];
+      var div = document.createElement('div');
+      div.className = 'carry-banner-item ' + (co.isCompensated ? 'paid' : 'unpaid');
+      var stText = co.isCompensated
+        ? 'Đã bù (ngày ' + formatShortDate(co.compensatedDate) + ')'
+        : (opts.deductUncompensated ? 'Chưa bù (Đã trừ -' + formatMoney(co.price) + 'đ vào tháng này)' : 'Chưa bù (Cần học bù trong tháng)');
+      div.innerHTML =
+        '<div style="display:flex; align-items:center; gap:6px;">' +
+          svgIcon(co.isCompensated ? 'task_alt' : 'error', 'icon-sm') +
+          '<span><b>Buổi nghỉ tháng trước:</b> Ngày ' + formatShortDate(co.fromDate) + ' (' + getWeekdayNameFromDateStr(co.fromDate) + ') — Ca ' + co.duration + ' (' + formatMoney(co.price) + 'đ)</span>' +
+        '</div>' +
+        '<span><b>' + stText + '</b></span>';
+      bannerEl.appendChild(div);
+    }
+
+    var dayHeaders = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'];
+    for (var h = 0; h < dayHeaders.length; h++) {
+      var hEl = document.createElement('div');
+      hEl.className = 'cal-head';
+      hEl.textContent = dayHeaders[h];
+      gridEl.appendChild(hEl);
+    }
+
+    var p = monthStr.split('-');
+    var year = Number(p[0]), month = Number(p[1]);
+    var daysInMonth = new Date(year, month, 0).getDate();
+    var firstDayJS = new Date(year, month - 1, 1).getDay();
+    var leadingEmpty = (firstDayJS + 6) % 7;
+
+    for (var e = 0; e < leadingEmpty; e++) {
+      var emptyCell = document.createElement('div');
+      emptyCell.className = 'cal-cell empty';
+      gridEl.appendChild(emptyCell);
+    }
+
+    for (var d = 1; d <= daysInMonth; d++) {
+      var dd = d < 10 ? '0' + d : String(d);
+      var mm = month < 10 ? '0' + month : String(month);
+      var fullDate = year + '-' + mm + '-' + dd;
+      var isToday = (fullDate === todayStr);
+
+      var cell = document.createElement('div');
+      cell.className = 'cal-cell' + (isToday ? ' is-today' : '');
+
+      var topBar = document.createElement('div');
+      topBar.className = 'cal-cell-top';
+      topBar.innerHTML =
+        '<span>' + d + '/' + mm + (isToday ? '<span class="today-pill">Hôm nay</span>' : '') + '</span>' +
+        '<button type="button" class="cal-add-btn" onclick="requestAddSessionOnDate(\'' + fullDate + '\')" title="Thêm buổi ngày ' + dd + '/' + mm + '">' +
+          svgIcon('add', 'icon-sm') +
+        '</button>';
+      cell.appendChild(topBar);
+
+      for (var sIdx = 0; sIdx < sessions.length; sIdx++) {
+        if (sessions[sIdx].date === fullDate) {
+          var sess = sessions[sIdx];
+          var isDef = (sess.isDefault !== false);
+          var card = document.createElement('div');
+          card.className = 'cal-sess-card st-' + sess.status;
+
+          var rateOpts = '';
+          for (var r = 0; r < stu.rates.length; r++) {
+            var rt = stu.rates[r];
+            rateOpts += '<option value="' + rt.label + '" ' + (rt.label === sess.duration ? 'selected' : '') + '>Ca ' + rt.label + '</option>';
+          }
+
+          var stOpts = isDef
+            ? '<option value="normal" ' + (sess.status === 'normal' ? 'selected' : '') + '>Học theo lịch</option>' +
+              '<option value="absent" ' + (sess.status === 'absent' ? 'selected' : '') + '>Nghỉ</option>'
+            : '<option value="makeup" ' + (sess.status === 'makeup' ? 'selected' : '') + '>Học bù</option>' +
+              '<option value="extra" ' + (sess.status === 'extra' ? 'selected' : '') + '>Học bổ sung</option>';
+
+          var isZeroed = (!isDef && sess.status === 'makeup') || (isDef && sess.status === 'absent' && opts.deductCurrentAbsent);
+          var priceInputHtml = isZeroed
+            ? '<input type="text" class="cal-mini-input money-input money-readonly" value="0 (' + (!isDef ? 'Cấn trừ' : 'Đã trừ') + ')" readonly>'
+            : '<input type="text" inputmode="numeric" class="cal-mini-input money-input" style="font-weight:700; color:#1e40af;" value="' + formatMoney(sess.price) + '" oninput="onMoneyInputKeyup(this)" onchange="onSessionPriceChange(' + sIdx + ', this.value)">';
+
+          var isChk = Boolean(sess.checkedIn);
+          var chkBadgeBtn =
+            '<button type="button" class="chk-in-toggle ' + (isChk ? 'checked' : '') + '" style="width:100%; justify-content:center; padding:3px 4px;" onclick="toggleSessionCheckin(' + sIdx + ')">' +
+              svgIcon(isChk ? 'check_circle' : 'radio_button_unchecked', 'icon-sm') +
+              '<span>' + (isChk ? 'Đã Check-in' : 'Check-in') + '</span>' +
+            '</button>';
+
+          card.innerHTML =
+            '<div class="cal-sess-row">' +
+              '<select class="cal-mini-select" style="font-weight:700;" onchange="onSessionDurationChange(' + sIdx + ', this.value)">' + rateOpts + '</select>' +
+              '<button type="button" class="cal-del-btn" onclick="requestRemoveSessionRow(' + sIdx + ')" title="Xóa buổi này">' +
+                svgIcon('delete', 'icon-sm') +
+              '</button>' +
+            '</div>' +
+            priceInputHtml +
+            '<select class="cal-mini-select" onchange="onSessionStatusChange(' + sIdx + ', this.value)">' + stOpts + '</select>' +
+            chkBadgeBtn;
+          cell.appendChild(card);
+        }
+      }
+      gridEl.appendChild(cell);
+    }
+  }
+
+  function onSessionDateChange(idx, val) {
+    var stu = getSelectedStudent();
+    var list = appData.monthlyLogs[getLogKey()];
+    if (!stu || !list || !list[idx] || !val) return;
+    guardPastMonthAction('Đổi ngày học', function() {
+      list[idx].date = val;
+      reconcileSubsequentMonths(stu);
+      saveStorage();
+      refreshAllUI();
+    }, function() { refreshBillingCalculation(); });
+  }
+
+  function onSessionDurationChange(idx, newDur) {
+    var stu = getSelectedStudent();
+    var list = appData.monthlyLogs[getLogKey()];
+    if (!stu || !list || !list[idx]) return;
+    guardPastMonthAction('Đổi số giờ học', function() {
+      list[idx].duration = newDur;
+      for (var i = 0; i < stu.rates.length; i++) {
+        if (stu.rates[i].label === newDur) { list[idx].price = Number(stu.rates[i].price); break; }
+      }
+      reconcileSubsequentMonths(stu);
+      saveStorage();
+      refreshAllUI();
+    }, function() { refreshBillingCalculation(); });
+  }
+
+  function onSessionPriceChange(idx, formattedVal) {
+    var stu = getSelectedStudent();
+    var list = appData.monthlyLogs[getLogKey()];
+    if (!stu || !list || !list[idx]) return;
+    guardPastMonthAction('Sửa số tiền buổi học', function() {
+      list[idx].price = parseRawMoney(formattedVal);
+      reconcileSubsequentMonths(stu);
+      saveStorage();
+      refreshAllUI();
+    }, function() { refreshBillingCalculation(); });
+  }
+
+  function onSessionStatusChange(idx, newStatus) {
+    var stu = getSelectedStudent();
+    var monthStr = getSelectedMonthStr();
+    var list = appData.monthlyLogs[getLogKey()];
+    if (!stu || !list || !list[idx]) return;
+
+    if (newStatus === 'makeup') {
+      var carryOvers = getCarryOverSessions(stu, monthStr);
+      var currentMakeups = 0;
+      for (var m = 0; m < list.length; m++) {
+        if (m !== idx && list[m].isDefault === false && list[m].status === 'makeup') currentMakeups++;
+      }
+      if (currentMakeups >= carryOvers.length) {
+        showToast('Không còn buổi nghỉ tháng trước nào cần bù! Hệ thống giữ trạng thái Học bổ sung.', 'warning');
+        refreshBillingCalculation();
+        return;
+      }
+    }
+
+    guardPastMonthAction('Đổi trạng thái buổi học', function() {
+      list[idx].status = newStatus;
+      if (newStatus === 'absent') list[idx].checkedIn = false;
+      reconcileSubsequentMonths(stu);
+      saveStorage();
+      refreshAllUI();
+    }, function() { refreshBillingCalculation(); });
+  }
+
+  function requestAddSessionRow() {
+    var monthStr = getSelectedMonthStr();
+    var parts = monthStr.split('-');
+    var maxDays = new Date(Number(parts[0]), Number(parts[1]), 0).getDate();
+    var day = Math.min(new Date().getDate(), maxDays);
+    var dd = day < 10 ? '0' + day : String(day);
+    requestAddSessionOnDate(monthStr + '-' + dd);
+  }
+
+  function requestAddSessionOnDate(fullDateStr) {
+    var stu = getSelectedStudent();
+    if (!stu) { showToast('Vui lòng thêm học viên ở tab Học viên trước!', 'warning'); return; }
+    guardPastMonthAction('Thêm buổi học mới', function() {
+      var monthStr = getSelectedMonthStr();
+      var key = getLogKey();
+      if (!appData.monthlyLogs[key]) appData.monthlyLogs[key] = [];
+
+      var carryOvers = getCarryOverSessions(stu, monthStr);
+      var hasUncompensated = false;
+      for (var i = 0; i < carryOvers.length; i++) if (!carryOvers[i].isCompensated) { hasUncompensated = true; break; }
+
+      var defaultRate = getDefaultRateObj(stu.rates);
+      appData.monthlyLogs[key].push({
+        date: fullDateStr,
+        duration: defaultRate.label,
+        price: Number(defaultRate.price),
+        status: hasUncompensated ? 'makeup' : 'extra',
+        isDefault: false,
+        checkedIn: false
+      });
+
+      reconcileSubsequentMonths(stu);
+      saveStorage();
+      refreshAllUI();
+      if (scheduleViewMode === 'list') {
+        var tbody = document.getElementById('sessionTableBody');
+        if (tbody && tbody.lastElementChild) tbody.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      showToast('Đã thêm buổi học ngày ' + formatShortDate(fullDateStr), 'add_circle');
+    });
+  }
+
+  function requestRemoveSessionRow(idx) {
+    var stu = getSelectedStudent();
+    var list = appData.monthlyLogs[getLogKey()];
+    if (!stu || !list || !list[idx]) return;
+    guardPastMonthAction('Xóa buổi học ngày ' + formatShortDate(list[idx].date), function() {
+      list.splice(idx, 1);
+      reconcileSubsequentMonths(stu);
+      saveStorage();
+      refreshAllUI();
+      showToast('Đã xóa buổi học', 'delete');
+    });
+  }
+
+  function calculateMonthlyBillingData() {
+    var stu = getSelectedStudent();
+    var monthStr = getSelectedMonthStr();
+    if (!stu) return null;
+
+    var sessions = appData.monthlyLogs[getLogKey()] || [];
+    var carryOvers = getCarryOverSessions(stu, monthStr);
+    var opts = getMonthOptions(stu.id, monthStr);
+
+    var currentAbsentSessions = [];
+    for (var i = 0; i < sessions.length; i++) {
+      if (sessions[i].isDefault !== false && sessions[i].status === 'absent') currentAbsentSessions.push(sessions[i]);
+    }
+
+    var compensatedCarry = [], uncompensatedCarry = [];
+    for (var c = 0; c < carryOvers.length; c++) {
+      if (carryOvers[c].isCompensated) compensatedCarry.push(carryOvers[c]);
+      else uncompensatedCarry.push(carryOvers[c]);
+    }
+
+    var canDeductUncomp = uncompensatedCarry.length > 0;
+    var canDeductCurrAbs = currentAbsentSessions.length > 0;
+
+    var chkUncompEl = document.getElementById('chkDeductUncompensated');
+    var chkCurrAbsEl = document.getElementById('chkDeductCurrentAbsent');
+    var chkShowDatesEl = document.getElementById('chkShowDates');
+
+    chkUncompEl.disabled = !canDeductUncomp;
+    document.getElementById('lblDeductUncompensated').classList.toggle('disabled', !canDeductUncomp);
+    document.getElementById('hintDeductUncompensated').textContent = canDeductUncomp ? ('Có ' + uncompensatedCarry.length + ' buổi chưa bù') : 'Không có buổi nợ';
+    if (!canDeductUncomp) opts.deductUncompensated = false;
+    chkUncompEl.checked = Boolean(opts.deductUncompensated);
+
+    chkCurrAbsEl.disabled = !canDeductCurrAbs;
+    document.getElementById('lblDeductCurrentAbsent').classList.toggle('disabled', !canDeductCurrAbs);
+    document.getElementById('hintDeductCurrentAbsent').textContent = canDeductCurrAbs ? ('Có ' + currentAbsentSessions.length + ' buổi nghỉ') : 'Không có buổi nghỉ';
+    if (!canDeductCurrAbs) opts.deductCurrentAbsent = false;
+    chkCurrAbsEl.checked = Boolean(opts.deductCurrentAbsent);
+
+    chkShowDatesEl.checked = (opts.showDates !== false);
+
+    var billableSessions = [], makeupSessions = [], extraSessions = [], checkedInCount = 0;
+    for (var k = 0; k < sessions.length; k++) {
+      var s = sessions[k];
+      if (s.checkedIn) checkedInCount++;
+      if (s.isDefault !== false) {
+        if (s.status === 'absent') {
+          if (!opts.deductCurrentAbsent) billableSessions.push(s);
+        } else {
+          billableSessions.push(s);
+        }
+      } else {
+        if (s.status === 'makeup') makeupSessions.push(s);
+        else if (s.status === 'extra') {
+          extraSessions.push(s);
+          billableSessions.push(s);
+        }
+      }
+    }
+
+    var grossAmount = 0, byDur = {}, durKeys = [];
+    for (var j = 0; j < billableSessions.length; j++) {
+      var bs = billableSessions[j];
+      var p = Number(bs.price || 0);
+      grossAmount += p;
+      var gKey = bs.duration + '_' + p;
+      if (!byDur[gKey]) {
+        byDur[gKey] = { duration: bs.duration, unitPrice: p, count: 0, subtotal: 0, dates: [] };
+        durKeys.push(gKey);
+      }
+      byDur[gKey].count++;
+      byDur[gKey].subtotal += p;
+      var tag = (!bs.isDefault && bs.status === 'extra') ? (formatShortDate(bs.date) + ' (bổ sung)') : formatShortDate(bs.date);
+      byDur[gKey].dates.push(tag);
+    }
+
+    var carryDeductionAmount = 0;
+    if (opts.deductUncompensated) {
+      for (var u = 0; u < uncompensatedCarry.length; u++) carryDeductionAmount += Number(uncompensatedCarry[u].price || 0);
+    }
+
+    var finalTotal = Math.max(0, grossAmount - carryDeductionAmount);
+
+    return {
+      stu: stu,
+      monthStr: monthStr,
+      billableSessions: billableSessions,
+      checkedInCount: checkedInCount,
+      currentAbsentSessions: currentAbsentSessions,
+      makeupSessions: makeupSessions,
+      extraSessions: extraSessions,
+      compensatedCarry: compensatedCarry,
+      uncompensatedCarry: uncompensatedCarry,
+      deductUncompensated: Boolean(opts.deductUncompensated),
+      deductCurrentAbsent: Boolean(opts.deductCurrentAbsent),
+      showDates: (opts.showDates !== false),
+      byDur: byDur,
+      durKeys: durKeys,
+      grossAmount: grossAmount,
+      carryDeductionAmount: carryDeductionAmount,
+      finalTotal: finalTotal
+    };
+  }
+
+  function refreshBillingCalculation() {
+    var data = calculateMonthlyBillingData();
+    renderScheduleViews();
+    if (!data) return;
+
+    document.getElementById('summaryBreakdown').textContent =
+      'Tính phí: ' + data.billableSessions.length + ' buổi (Đã Check-in: ' + data.checkedInCount +
+      ' | Đã bù: ' + data.compensatedCarry.length + '/' + (data.compensatedCarry.length + data.uncompensatedCarry.length) +
+      ' | Nghỉ: ' + data.currentAbsentSessions.length + ')';
+
+    var details = [];
+    for (var i = 0; i < data.durKeys.length; i++) {
+      var g = data.byDur[data.durKeys[i]];
+      details.push('Ca ' + g.duration + ': ' + g.count + 'b = ' + formatMoney(g.subtotal) + 'đ');
+    }
+    if (data.deductUncompensated && data.carryDeductionAmount > 0) {
+      details.push('Trừ chưa bù: -' + formatMoney(data.carryDeductionAmount) + 'đ');
+    }
+    document.getElementById('summarySubDetail').textContent = details.length > 0 ? details.join(' • ') : 'Chưa có buổi học tính phí';
+    document.getElementById('summaryTotalAmount').textContent = formatMoney(data.finalTotal) + ' đ';
+
+    generateMessage(data);
+  }
+
+  function generateMessage(precalcData) {
+    var data = precalcData || calculateMonthlyBillingData();
+    if (!data) { document.getElementById('generatedMessageText').value = ''; return; }
+
+    var stu = data.stu;
+    var mParts = data.monthStr.split('-');
+    var monthYearLabel = Number(mParts[1]) + '/' + mParts[0];
+    var pTitle = stu.parentTitle || 'chị';
+    var pTitleCap = capitalizeFirst(pTitle);
+    var lines = [];
+
+    lines.push('Em chào ' + pTitle + ' ạ,');
+    lines.push(pTitleCap + ' ơi, tháng ' + monthYearLabel + ' con học tổng cộng ' + data.billableSessions.length + ' buổi ạ.');
+
+    for (var k = 0; k < data.durKeys.length; k++) {
+      var g = data.byDur[data.durKeys[k]];
+      lines.push('- Ca ' + g.duration + ' (' + formatMoney(g.unitPrice) + 'đ/buổi): ' + g.count + ' buổi x ' + formatMoney(g.unitPrice) + 'đ = ' + formatMoney(g.subtotal) + 'đ');
+      if (data.showDates && g.dates.length > 0) lines.push('  + Ngày học: ' + g.dates.join(', '));
+    }
+
+    if (data.compensatedCarry.length > 0) {
+      var compDates = [];
+      for (var c = 0; c < data.compensatedCarry.length; c++) {
+        compDates.push(formatShortDate(data.compensatedCarry[c].fromDate) + ' (bù ngày ' + formatShortDate(data.compensatedCarry[c].compensatedDate) + ')');
+      }
+      lines.push('- Buổi nghỉ tháng trước đã học bù (' + data.compensatedCarry.length + ' buổi): ' + compDates.join(', '));
+    }
+
+    if (data.uncompensatedCarry.length > 0) {
+      var uncompDates = [];
+      for (var u = 0; u < data.uncompensatedCarry.length; u++) uncompDates.push(formatShortDate(data.uncompensatedCarry[u].fromDate));
+      if (data.deductUncompensated) {
+        lines.push('- Buổi nghỉ đã trừ (' + data.uncompensatedCarry.length + ' buổi): -' + formatMoney(data.carryDeductionAmount) + 'đ (ngày ' + uncompDates.join(', ') + ')');
+      } else {
+        lines.push('- Buổi nghỉ tháng trước chưa bù (' + data.uncompensatedCarry.length + ' buổi): ' + uncompDates.join(', '));
+      }
+    }
+
+    if (data.currentAbsentSessions.length > 0) {
+      var absDates = [];
+      for (var a = 0; a < data.currentAbsentSessions.length; a++) absDates.push(formatShortDate(data.currentAbsentSessions[a].date));
+      if (data.deductCurrentAbsent) {
+        lines.push('- Buổi nghỉ đã trừ (' + data.currentAbsentSessions.length + ' buổi - 0đ): ' + absDates.join(', '));
+      } else {
+        lines.push('- Buổi nghỉ chuyển sang tháng sau học bù (' + data.currentAbsentSessions.length + ' buổi): ' + absDates.join(', '));
+      }
+    }
+
+    lines.push('');
+    lines.push('Tổng tiền học tháng ' + monthYearLabel + ' của con là ' + formatMoney(data.finalTotal) + 'đ');
+    lines.push('Khi nào rảnh ' + pTitle + ' kiểm tra lại giúp em xem có nhầm lẫn gì không ạ. Xong ' + pTitle + ' có thể chuyển cho em qua mã QR này giúp em với ạ');
+    lines.push('Em cảm ơn ' + pTitle + ' nhiều ạ!');
+
+    document.getElementById('generatedMessageText').value = lines.join('\n');
+  }
+
+  function copyMessage() {
+    var textarea = document.getElementById('generatedMessageText');
+    if (!textarea.value.trim()) { showToast('Chưa có nội dung tin nhắn!', 'warning'); return; }
+    textarea.select();
+    try { document.execCommand('copy'); showToast('Đã copy tin nhắn!', 'content_copy'); }
+    catch (e) { showToast('Hãy bấm Ctrl+C để copy', 'info'); }
+  }
+
+  function nextStudent() {
+    var select = document.getElementById('billingStudentSelect');
+    if (!appData.students || appData.students.length <= 1) return;
+    select.selectedIndex = (select.selectedIndex + 1) % select.options.length;
+    onStudentOrMonthChange();
+  }
+
+  function renderStudentSelect() {
+    var select = document.getElementById('billingStudentSelect');
+    var prevVal = select.value;
+    select.innerHTML = '';
+    if (appData.students.length === 0) {
+      var emptyOpt = document.createElement('option');
+      emptyOpt.value = ''; emptyOpt.textContent = '-- Chưa có học viên --';
+      select.appendChild(emptyOpt);
+      return;
+    }
+    for (var i = 0; i < appData.students.length; i++) {
+      var stu = appData.students[i];
+      var opt = document.createElement('option');
+      opt.value = stu.id;
+      opt.textContent = stu.name + ' (PH: ' + (stu.parentTitle || 'chị') + ' ' + stu.parentName + ')';
+      select.appendChild(opt);
+    }
+    var exists = false;
+    for (var j = 0; j < appData.students.length; j++) if (appData.students[j].id === prevVal) { exists = true; break; }
+    select.value = exists ? prevVal : appData.students[0].id;
+  }
+
+  // ================= MÀN HÌNH 2: DANH SÁCH HỌC VIÊN & POPUP MODAL =================
+  function setRateCollapseState(isOpen) {
+    var box = document.getElementById('rateCollapseBox');
+    var iconWrap = document.getElementById('rateCollapseIconWrap');
+    box.classList.toggle('open', isOpen);
+    iconWrap.innerHTML = svgIcon(isOpen ? 'expand_less' : 'expand_more', 'icon-sm');
+    updateCollapsedRateSummary();
+  }
+  function toggleRateCollapse() {
+    var box = document.getElementById('rateCollapseBox');
+    setRateCollapseState(!box.classList.contains('open'));
+  }
+  function expandRateSectionAndAddRow() {
+    setRateCollapseState(true);
+    addRateConfigRow('', 500000, true);
+  }
+  function updateCollapsedRateSummary() {
+    var rows = getFormRateRows();
+    var badges = [];
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i].label) badges.push('<span class="badge badge-blue">' + rows[i].label + ': ' + formatMoney(rows[i].price) + 'đ</span>');
+    }
+    document.getElementById('collapsedRateSummary').innerHTML = badges.join(' ');
+  }
+
+  function openAddStudentModal() {
+    resetStudentForm();
+    setRateCollapseState(false);
+    document.getElementById('studentModal').classList.add('open');
+    setTimeout(function() { document.getElementById('studentNameInput').focus(); }, 40);
+  }
+  function closeStudentModal() {
+    document.getElementById('studentModal').classList.remove('open');
+  }
+
+  function renderRateConfigRows(ratesArray) {
+    var container = document.getElementById('rateConfigList');
+    container.innerHTML = '';
+    var list = (ratesArray && ratesArray.length > 0) ? ratesArray : DEFAULT_RATES;
+    for (var i = 0; i < list.length; i++) addRateConfigRow(list[i].label, list[i].price, false);
+    updateCollapsedRateSummary();
+  }
+
+  function addRateConfigRow(label, price, updateWeekdays) {
+    var container = document.getElementById('rateConfigList');
+    var rateId = 'rate_' + (++rateRowCounter);
+    var div = document.createElement('div');
+    div.className = 'rate-item';
+    div.setAttribute('data-rate-id', rateId);
+    div.innerHTML =
+      '<div><label style="font-size:11px; color:var(--muted);">Loại giờ học</label><input type="text" class="cfg-rate-label" placeholder="VD: 1h30, 2h" value="' + (label || '') + '" style="width:100%;" oninput="this.classList.remove(\'input-error\'); updateWeekdayOptionLabels()"></div>' +
+      '<div><label style="font-size:11px; color:var(--muted);">Số tiền / buổi (VNĐ)</label><input type="text" inputmode="numeric" class="cfg-rate-price money-input" value="' + formatMoney(price || 0) + '" style="width:100%; font-weight:700;" oninput="onMoneyInputKeyup(this); updateWeekdayOptionLabels()"></div>' +
+      '<div style="padding-top:16px;"><button type="button" class="btn btn-danger btn-sm btn-icon-only" onclick="removeRateConfigRow(this)" title="Xóa loại giờ này">' + svgIcon('delete') + '</button></div>';
+    container.appendChild(div);
+    if (updateWeekdays) {
+      var selects = document.querySelectorAll('#weekdayConfigGrid .wd-select');
+      for (var i = 0; i < selects.length; i++) {
+        var opt = document.createElement('option');
+        opt.value = rateId; opt.textContent = 'Ca ' + (label || '(Mới)') + ' (' + formatMoney(price) + 'đ)';
+        selects[i].appendChild(opt);
+      }
+    }
+    updateCollapsedRateSummary();
+  }
+
+  function updateWeekdayOptionLabels() {
+    var items = document.querySelectorAll('#rateConfigList .rate-item');
+    var map = {};
+    for (var i = 0; i < items.length; i++) {
+      var rId = items[i].getAttribute('data-rate-id');
+      var lbl = items[i].querySelector('.cfg-rate-label').value.trim() || '(Chưa đặt tên)';
+      var prc = parseRawMoney(items[i].querySelector('.cfg-rate-price').value);
+      map[rId] = 'Ca ' + lbl + ' (' + formatMoney(prc) + 'đ)';
+    }
+    var selects = document.querySelectorAll('#weekdayConfigGrid .wd-select');
+    for (var j = 0; j < selects.length; j++) {
+      var opts = selects[j].options;
+      for (var k = 0; k < opts.length; k++) if (map[opts[k].value]) opts[k].textContent = map[opts[k].value];
+    }
+    updateCollapsedRateSummary();
+  }
+
+  function removeRateConfigRow(btn) {
+    var container = document.getElementById('rateConfigList');
+    if (container.querySelectorAll('.rate-item').length <= 1) { showToast('Cần giữ ít nhất 1 loại giờ học!', 'warning'); return; }
+    var row = btn.closest('.rate-item');
+    var rId = row.getAttribute('data-rate-id');
+    container.removeChild(row);
+    var selects = document.querySelectorAll('#weekdayConfigGrid .wd-select');
+    for (var i = 0; i < selects.length; i++) {
+      for (var j = selects[i].options.length - 1; j >= 0; j--) if (selects[i].options[j].value === rId) selects[i].remove(j);
+    }
+    updateCollapsedRateSummary();
+  }
+
+  function getFormRateRows() {
+    var items = document.querySelectorAll('#rateConfigList .rate-item');
+    var list = [];
+    for (var i = 0; i < items.length; i++) {
+      list.push({
+        rateId: items[i].getAttribute('data-rate-id'),
+        labelInput: items[i].querySelector('.cfg-rate-label'),
+        label: items[i].querySelector('.cfg-rate-label').value.trim(),
+        price: parseRawMoney(items[i].querySelector('.cfg-rate-price').value)
+      });
+    }
+    return list;
+  }
+
+  function renderWeekdayGrid(scheduleArray) {
+    var grid = document.getElementById('weekdayConfigGrid');
+    var rateRows = getFormRateRows();
+    grid.innerHTML = '';
+    var sched = scheduleArray || [];
+    var default2hRateId = rateRows.length > 0 ? rateRows[0].rateId : '';
+    for (var dIdx = 0; dIdx < rateRows.length; dIdx++) {
+      if (rateRows[dIdx].label.toLowerCase() === DEFAULT_DURATION_LABEL) { default2hRateId = rateRows[dIdx].rateId; break; }
+    }
+
+    for (var i = 0; i < WEEKDAYS.length; i++) {
+      var wd = WEEKDAYS[i], matched = null;
+      for (var j = 0; j < sched.length; j++) if (Number(sched[j].day) === wd.day) { matched = sched[j]; break; }
+      var isChecked = Boolean(matched), selectedRateId = default2hRateId;
+      if (matched) {
+        for (var k = 0; k < rateRows.length; k++) {
+          if (rateRows[k].label.toLowerCase() === String(matched.duration).toLowerCase()) { selectedRateId = rateRows[k].rateId; break; }
+        }
+      }
+      var optionsHtml = '';
+      for (var m = 0; m < rateRows.length; m++) {
+        var r = rateRows[m];
+        optionsHtml += '<option value="' + r.rateId + '" ' + (r.rateId === selectedRateId ? 'selected' : '') + '>Ca ' + (r.label || 'Mới') + ' (' + formatMoney(r.price) + 'đ)</option>';
+      }
+      var card = document.createElement('div');
+      card.className = 'weekday-card' + (isChecked ? ' active' : '');
+      card.setAttribute('data-day', wd.day);
+      card.innerHTML =
+        '<label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:13px; font-weight:600;">' +
+          '<input type="checkbox" class="wd-checkbox" ' + (isChecked ? 'checked' : '') + ' onchange="this.parentNode.parentNode.className = this.checked ? \'weekday-card active\' : \'weekday-card\'">' +
+          '<span>' + wd.name + '</span>' +
+        '</label>' +
+        '<select class="wd-select" style="padding:4px 6px; font-size:12px;">' + optionsHtml + '</select>';
+      grid.appendChild(card);
+    }
+  }
+
+  function getFormWeeklySchedule() {
+    var rateRows = getFormRateRows(), idToLabel = {};
+    for (var i = 0; i < rateRows.length; i++) idToLabel[rateRows[i].rateId] = rateRows[i].label || DEFAULT_DURATION_LABEL;
+    var schedule = [], cards = document.querySelectorAll('#weekdayConfigGrid .weekday-card');
+    for (var j = 0; j < cards.length; j++) {
+      var chk = cards[j].querySelector('.wd-checkbox'), sel = cards[j].querySelector('.wd-select');
+      if (chk && chk.checked) {
+        schedule.push({ day: Number(cards[j].getAttribute('data-day')), duration: idToLabel[sel ? sel.value : ''] || DEFAULT_DURATION_LABEL });
+      }
+    }
+    return schedule;
+  }
+
+  function resetRatesToDefault() {
+    var currentSched = getFormWeeklySchedule();
+    renderRateConfigRows(DEFAULT_RATES);
+    renderWeekdayGrid(currentSched);
+    showToast('Đã đặt về mặc định: 1h30 (450.000) & 2h (500.000)', 'restart_alt');
+  }
+
+  function resetStudentForm() {
+    document.getElementById('studentFormTitle').innerHTML = svgIcon('person_add', '', 'color:var(--primary);') + '<span>Thêm Học Viên Mới</span>';
+    document.getElementById('editStudentId').value = '';
+    var nameIn = document.getElementById('studentNameInput');
+    var pNameIn = document.getElementById('parentNameInput');
+    nameIn.value = ''; nameIn.classList.remove('input-error');
+    pNameIn.value = ''; pNameIn.classList.remove('input-error');
+    document.getElementById('parentTitleInput').value = 'chị';
+    renderRateConfigRows(DEFAULT_RATES);
+    renderWeekdayGrid([]);
+  }
+
+  function commitSaveStudent(editId, name, parentTitle, parentName, validRates, weeklySchedule) {
+    var currentMonth = getSelectedMonthStr();
+    if (editId) {
+      for (var j = 0; j < appData.students.length; j++) {
+        if (appData.students[j].id === editId) {
+          appData.students[j] = { id: editId, name: name, parentTitle: parentTitle, parentName: parentName, rates: validRates, weeklySchedule: weeklySchedule };
+          break;
+        }
+      }
+      saveStorage();
+      closeStudentModal();
+      refreshAllUI();
+      showToast('Đã lưu cấu hình học viên (Dữ liệu lịch cũ được giữ nguyên)', 'check_circle');
+    } else {
+      var newId = 'stu_' + Date.now();
+      var newStu = { id: newId, name: name, parentTitle: parentTitle, parentName: parentName, rates: validRates, weeklySchedule: weeklySchedule };
+      appData.students.push(newStu);
+      appData.monthlyLogs[newId + '_' + currentMonth] = buildDefaultSessionsForMonth(newStu, currentMonth);
+      saveStorage();
+      closeStudentModal();
+      refreshAllUI();
+      document.getElementById('billingStudentSelect').value = newId;
+      onStudentOrMonthChange();
+      showToast('Đã thêm học viên mới: ' + name, 'person_add');
+    }
+  }
+
+  function saveStudent() {
+    var editId = document.getElementById('editStudentId').value.trim();
+    var nameEl = document.getElementById('studentNameInput');
+    var parentNameEl = document.getElementById('parentNameInput');
+    var name = nameEl.value.trim();
+    var parentTitle = document.getElementById('parentTitleInput').value;
+    var parentName = parentNameEl.value.trim();
+
+    if (!name) { nameEl.classList.add('input-error'); nameEl.focus(); showToast('Vui lòng nhập Tên Học Viên!', 'warning'); return; }
+    if (!parentName) { parentNameEl.classList.add('input-error'); parentNameEl.focus(); showToast('Vui lòng nhập Tên Phụ Huynh!', 'warning'); return; }
+
+    var rawRates = getFormRateRows(), validRates = [], seenLabels = {};
+    for (var i = 0; i < rawRates.length; i++) {
+      if (!rawRates[i].label) {
+        setRateCollapseState(true);
+        rawRates[i].labelInput.classList.add('input-error');
+        rawRates[i].labelInput.focus();
+        showToast('Tên loại giờ học không được để trống!', 'warning');
+        return;
+      }
+      var low = rawRates[i].label.toLowerCase();
+      if (seenLabels[low]) {
+        setRateCollapseState(true);
+        rawRates[i].labelInput.classList.add('input-error');
+        rawRates[i].labelInput.focus();
+        showToast('Loại giờ học "' + rawRates[i].label + '" đang bị trùng!', 'warning');
+        return;
+      }
+      seenLabels[low] = true;
+      validRates.push({ label: rawRates[i].label, price: rawRates[i].price });
+    }
+
+    var weeklySchedule = getFormWeeklySchedule();
+    if (weeklySchedule.length === 0) {
+      askConfirm(
+        'Chưa chọn lịch học cố định',
+        'Bạn chưa tích chọn thứ học cố định nào trong tuần cho học viên "' + name + '". Bạn vẫn muốn lưu học viên này chứ?',
+        function() { commitSaveStudent(editId, name, parentTitle, parentName, validRates, weeklySchedule); }
+      );
+    } else {
+      commitSaveStudent(editId, name, parentTitle, parentName, validRates, weeklySchedule);
+    }
+  }
+
+  function editStudent(studentId) {
+    var stu = null;
+    for (var i = 0; i < appData.students.length; i++) if (appData.students[i].id === studentId) { stu = appData.students[i]; break; }
+    if (!stu) return;
+    document.getElementById('studentFormTitle').innerHTML = svgIcon('edit_square', '', 'color:var(--primary);') + '<span>Sửa Học Viên: ' + stu.name + '</span>';
+    document.getElementById('editStudentId').value = stu.id;
+    var nameEl = document.getElementById('studentNameInput');
+    var pNameEl = document.getElementById('parentNameInput');
+    nameEl.value = stu.name; nameEl.classList.remove('input-error');
+    pNameEl.value = stu.parentName; pNameEl.classList.remove('input-error');
+    document.getElementById('parentTitleInput').value = stu.parentTitle || 'chị';
+    renderRateConfigRows(stu.rates || DEFAULT_RATES);
+    renderWeekdayGrid(stu.weeklySchedule || []);
+    setRateCollapseState(false);
+    document.getElementById('studentModal').classList.add('open');
+  }
+
+  function editCurrentBillingStudent() {
+    var stu = getSelectedStudent();
+    if (stu) editStudent(stu.id); else openAddStudentModal();
+  }
+
+  function requestDeleteStudent(studentId) {
+    var stu = null;
+    for (var i = 0; i < appData.students.length; i++) if (appData.students[i].id === studentId) { stu = appData.students[i]; break; }
+    if (!stu) return;
+    askConfirm(
+      'Xác nhận xóa học viên',
+      'Bạn có chắc chắn muốn xóa học viên "' + stu.name + '" (PH: ' + (stu.parentTitle || 'chị') + ' ' + stu.parentName + ')?',
+      function() {
+        var filtered = [];
+        for (var j = 0; j < appData.students.length; j++) if (appData.students[j].id !== studentId) filtered.push(appData.students[j]);
+        appData.students = filtered;
+        saveStorage();
+        refreshAllUI();
+        showToast('Đã xóa học viên ' + stu.name, 'delete');
+      }
+    );
+  }
+
+  function renderStudentListTable() {
+    var tbody = document.getElementById('studentListTableBody');
+    tbody.innerHTML = '';
+    if (appData.students.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:24px; color:var(--muted);">Chưa có học viên nào. Hãy bấm nút <b>"Thêm mới"</b> ở góc phải để thêm học viên.</td></tr>';
+      return;
+    }
+    for (var i = 0; i < appData.students.length; i++) {
+      var stu = appData.students[i], rateHtml = '', schedHtml = '';
+      var rates = stu.rates || [];
+      for (var r = 0; r < rates.length; r++) rateHtml += '<span class="badge badge-blue">' + rates[r].label + ': ' + formatMoney(rates[r].price) + 'đ</span> ';
+      var sched = stu.weeklySchedule || [];
+      for (var w = 0; w < sched.length; w++) {
+        var wdName = '';
+        for (var d = 0; d < WEEKDAYS.length; d++) if (WEEKDAYS[d].day === Number(sched[w].day)) { wdName = WEEKDAYS[d].name; break; }
+        schedHtml += '<span class="badge">' + wdName + ' (' + sched[w].duration + ')</span> ';
+      }
+      if (!schedHtml) schedHtml = '<span style="color:var(--muted); font-size:12px;">Chưa chọn thứ</span>';
+
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td><b>' + stu.name + '</b></td>' +
+        '<td>' + (stu.parentTitle || 'chị') + ' ' + stu.parentName + '</td>' +
+        '<td>' + rateHtml + '</td>' +
+        '<td>' + schedHtml + '</td>' +
+        '<td style="text-align:right; white-space:nowrap;">' +
+          '<button type="button" class="btn btn-outline btn-sm btn-icon-only" onclick="editStudent(\'' + stu.id + '\')" title="Sửa học viên">' + svgIcon('edit') + '</button> ' +
+          '<button type="button" class="btn btn-danger btn-sm btn-icon-only" onclick="requestDeleteStudent(\'' + stu.id + '\')" title="Xóa học viên">' + svgIcon('delete') + '</button>' +
+        '</td>';
+      tbody.appendChild(tr);
+    }
+  }
+
+  function exportJSON() {
+    var blob = new Blob([JSON.stringify(appData, null, 2)], { type: 'application/json;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'thiet-lap-hoc-vien-' + getSelectedMonthStr() + '.json';
+    a.click(); URL.revokeObjectURL(url);
+    showToast('Đã xuất thiết lập học viên (.json)!', 'download');
+  }
+
+  function importJSON(event) {
+    var file = event.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        var parsed = JSON.parse(e.target.result);
+        if (parsed && Array.isArray(parsed.students)) {
+          if (!parsed.monthlyLogs) parsed.monthlyLogs = {};
+          if (!parsed.monthlyOptions) parsed.monthlyOptions = {};
+          appData = parsed; saveStorage(); refreshAllUI();
+          showToast('Đã nhập thiết lập học viên thành công!', 'upload_file');
+        }
+      } catch (err) { showToast('Lỗi đọc file!', 'error'); }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  }
+
+  function exportCSV() {
+    var monthStr = getSelectedMonthStr();
+    var rows = [['Tháng', 'Học Viên', 'Phụ Huynh', 'Ngày Học', 'Thứ', 'Giờ Học', 'Trạng Thái', 'Check-in', 'Thành Tiền (VNĐ)']];
+    for (var i = 0; i < appData.students.length; i++) {
+      var stu = appData.students[i];
+      var sessions = appData.monthlyLogs[stu.id + '_' + monthStr] || buildDefaultSessionsForMonth(stu, monthStr);
+      for (var j = 0; j < sessions.length; j++) {
+        var s = sessions[j];
+        var stLabel = s.isDefault !== false ? (s.status === 'absent' ? 'Nghỉ' : 'Học theo lịch') : (s.status === 'makeup' ? 'Học bù' : 'Học bổ sung');
+        var chkLabel = s.checkedIn ? 'Đã Check-in' : 'Chưa Check-in';
+        var amt = (s.status === 'absent' || s.status === 'makeup') ? 0 : s.price;
+        rows.push([monthStr, stu.name, stu.parentTitle + ' ' + stu.parentName, s.date, getWeekdayNameFromDateStr(s.date), s.duration, stLabel, chkLabel, formatMoney(amt)]);
+      }
+    }
+    var csv = '\uFEFF';
+    for (var r = 0; r < rows.length; r++) csv += rows[r].join(',') + '\r\n';
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'thong-tin-hoc-phi-' + monthStr + '.csv';
+    a.click(); URL.revokeObjectURL(url);
+    showToast('Đã lưu thông tin học phí (.csv)!', 'table_view');
+  }
+
+  function refreshAllUI() {
+    renderStudentSelect();
+    renderStudentListTable();
+    renderCheckinScreen();
+    onStudentOrMonthChange();
+  }
+
+  // Kiểm tra nếu URL có chứa mã kết nối nhanh từ QR (#sync=token|gistId)
+  function checkMagicSyncUrlHash() {
+    var hash = window.location.hash || '';
+    if (hash.indexOf('#sync=') === 0) {
+      try {
+        var decoded = decodeURIComponent(hash.slice(6));
+        var parts = decoded.split('|');
+        if (parts.length === 2 && parts[0] && parts[1]) {
+          syncConfig = { token: parts[0], gistId: parts[1] };
+          localStorage.setItem(SYNC_CFG_KEY, JSON.stringify(syncConfig));
+          history.replaceState(null, '', window.location.pathname + window.location.search);
+          showToast('Đã tự động kết nối đồng bộ trên thiết bị này!', 'cloud_done');
+        }
+      } catch (e) {}
+    }
+  }
+
+  (function initApp() {
+    hydrateStaticIcons();
+    document.getElementById('billingMonthInput').value = getCurrentMonthStr();
+    loadStorage();
+    checkMagicSyncUrlHash();
+    resetStudentForm();
+    updateSyncHeaderUI();
+    refreshAllUI();
+    // Mặc định luôn mở màn hình Check-in đầu tiên theo yêu cầu
+    switchTab('checkin');
+    if (syncConfig.token && syncConfig.gistId) {
+      pullFromCloud(false);
+    }
+  })();
+</script>
+</body>
+</html>
