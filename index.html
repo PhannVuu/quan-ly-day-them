@@ -22,9 +22,10 @@
       --focus-ring:0 0 0 3px rgba(37,99,235,0.35);
     }
     * { box-sizing:border-box; margin:0; padding:0; font-family:'Roboto',-apple-system,BlinkMacSystemFont,sans-serif; -webkit-tap-highlight-color:transparent; }
-    body { background:var(--bg); color:var(--text); line-height:1.5; padding-bottom:calc(40px + env(safe-area-inset-bottom)); }
+    html, body { width:100%; max-width:100vw; overflow-x:hidden; background:var(--bg); color:var(--text); line-height:1.5; }
+    body { padding-bottom:calc(40px + env(safe-area-inset-bottom)); }
 
-    /* Hệ thống SVG Icon nội tuyến chuẩn Google Material (Không bao giờ lỗi trên iPhone) */
+    /* Hệ thống SVG Icon nội tuyến chuẩn Google Material */
     .g-icon { width:18px; height:18px; fill:currentColor; display:inline-block; vertical-align:middle; flex-shrink:0; user-select:none; }
     .g-icon.icon-sm { width:16px; height:16px; }
     .g-icon.icon-lg { width:22px; height:22px; }
@@ -47,52 +48,46 @@
       display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
       position:sticky; top:0; z-index:50; box-shadow:0 2px 4px rgba(0,0,0,0.04);
     }
-    .brand { font-size:18px; font-weight:800; color:var(--primary); display:flex; align-items:center; gap:8px; }
+    .brand { font-size:18px; font-weight:800; color:var(--primary); display:flex; align-items:center; gap:8px; min-width:0; }
     .nav-tabs { display:flex; gap:6px; flex-wrap:wrap; }
-    .tab-btn { min-height:36px; padding:7px 14px; border:1px solid var(--border); background:#f8fafc; border-radius:8px; cursor:pointer; font-weight:700; font-size:13.5px; color:#334155; display:inline-flex; align-items:center; gap:6px; transition:0.15s; user-select:none; }
+    .tab-btn { min-height:36px; padding:7px 14px; border:1px solid var(--border); background:#f8fafc; border-radius:8px; cursor:pointer; font-weight:700; font-size:13.5px; color:#334155; display:inline-flex; align-items:center; justify-content:center; gap:6px; transition:0.15s; user-select:none; }
     .tab-btn:hover { border-color:var(--primary); color:var(--primary); }
 
     .menu-wrap { position:relative; }
-    .dropdown-menu { position:absolute; right:0; top:calc(100% + 6px); background:var(--card); border:1px solid var(--border); border-radius:10px; box-shadow:0 10px 25px rgba(0,0,0,0.14); min-width:255px; z-index:100; display:none; overflow:hidden; padding:4px 0; }
+    .dropdown-menu { position:absolute; right:0; top:calc(100% + 6px); background:var(--card); border:1px solid var(--border); border-radius:10px; box-shadow:0 10px 25px rgba(0,0,0,0.14); min-width:255px; max-width:90vw; z-index:100; display:none; overflow:hidden; padding:4px 0; }
     .dropdown-menu.open { display:block; }
     .menu-item { width:100%; min-height:40px; padding:9px 14px; border:none; background:none; text-align:left; font-size:13.5px; font-weight:500; color:var(--text); display:flex; align-items:center; gap:10px; cursor:pointer; }
     .menu-item:hover { background:#f1f5f9; color:var(--primary); }
     .menu-divider { height:1px; background:#e2e8f0; margin:4px 0; }
 
-    /* Container lề 1cm (10mm) trên PC, tự thu gọn trên iPhone */
+    /* Container lề 1cm (10mm) trên PC */
     .container { width:100%; max-width:100%; margin:14px auto; padding:0 10mm; }
     .split-layout { display:grid; grid-template-columns:minmax(0,7fr) minmax(0,3fr); gap:16px; align-items:start; }
-    @media (max-width:1024px) { .split-layout { grid-template-columns:1fr; } }
-    @media (max-width:640px) {
-      header { padding:calc(8px + env(safe-area-inset-top)) 12px 8px 12px; }
-      .container { padding:0 12px; margin:10px auto; }
-      .brand span { font-size:16px; }
-      .tab-btn { padding:6px 10px; font-size:12.5px; }
-    }
+    @media (max-width:1024px) { .split-layout { grid-template-columns:minmax(0,1fr); } }
 
-    .card { background:var(--card); border:1px solid #e2e8f0; border-radius:12px; padding:16px; box-shadow:0 1px 3px rgba(0,0,0,0.05); }
+    .card { background:var(--card); border:1px solid #e2e8f0; border-radius:12px; padding:16px; box-shadow:0 1px 3px rgba(0,0,0,0.05); max-width:100%; overflow:hidden; }
     .card-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid #e2e8f0; }
     .card-title { font-size:15.5px; font-weight:700; color:#1e293b; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
 
     /* MÀN HÌNH CHECK-IN CARDS */
-    .checkin-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; margin-top:12px; }
+    .checkin-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:14px; margin-top:10px; }
     .checkin-card {
-      background:#fff; border:1.5px solid #cbd5e1; border-radius:12px; padding:15px;
+      background:#fff; border:1.5px solid #cbd5e1; border-radius:12px; padding:14px;
       display:flex; flex-direction:column; gap:12px; transition:all 0.2s;
-      box-shadow:0 2px 5px rgba(0,0,0,0.03);
+      box-shadow:0 2px 5px rgba(0,0,0,0.03); min-width:0;
     }
     .checkin-card.priority-today { border-color:var(--primary); background:linear-gradient(180deg,#f8faff 0%,#ffffff 100%); border-left:5px solid var(--primary); }
     .checkin-card-top { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
-    .checkin-stu-name { font-size:17px; font-weight:800; color:#0f172a; }
+    .checkin-stu-name { font-size:17px; font-weight:800; color:#0f172a; word-break:break-word; }
     .checkin-parent { font-size:12.5px; color:var(--muted); margin-top:2px; }
-    .checkin-controls { display:grid; grid-template-columns:1fr 1.2fr; gap:8px; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0; }
+    .checkin-controls { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); gap:8px; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0; }
     .checkin-actions { display:flex; gap:8px; }
     .btn-checkin-main { flex:1; min-height:42px; font-size:14px; font-weight:700; }
-    .section-sub-label { font-size:13px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.4px; margin:16px 0 8px 0; display:flex; align-items:center; gap:6px; }
+    .section-sub-label { font-size:13px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.4px; margin:14px 0 8px 0; display:flex; align-items:center; gap:6px; }
 
     /* Nút Tick Check-in trong lịch chi tiết */
     .chk-in-toggle {
-      display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:6px;
+      display:inline-flex; align-items:center; gap:4px; padding:4px 8px; border-radius:6px;
       font-size:11.5px; font-weight:700; cursor:pointer; border:1px solid #cbd5e1;
       background:#f8fafc; color:var(--muted); transition:0.15s; user-select:none;
     }
@@ -100,22 +95,22 @@
     .chk-in-toggle:hover { border-color:var(--primary); }
 
     .default-schedule-banner { background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid var(--primary); padding:8px 12px; border-radius:6px; margin-bottom:10px; font-size:13px; display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; }
-    .legend-bar { display:flex; gap:14px; flex-wrap:wrap; align-items:center; font-size:12px; color:var(--muted); margin-bottom:12px; padding:6px 10px; background:#f8fafc; border-radius:6px; border:1px dashed #cbd5e1; }
+    .legend-bar { display:flex; gap:12px; flex-wrap:wrap; align-items:center; font-size:12px; color:var(--muted); margin-bottom:12px; padding:6px 10px; background:#f8fafc; border-radius:6px; border:1px dashed #cbd5e1; }
     .legend-item { display:inline-flex; align-items:center; gap:5px; font-weight:500; }
-    .legend-dot { width:10px; height:10px; border-radius:3px; display:inline-block; }
+    .legend-dot { width:10px; height:10px; border-radius:3px; display:inline-block; flex-shrink:0; }
 
     /* Forms */
     .form-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:12px; }
-    .form-group { display:flex; flex-direction:column; gap:5px; margin-bottom:12px; }
-    label.field-label { font-size:13px; font-weight:700; color:#334155; display:flex; align-items:center; gap:6px; }
-    input, select, textarea { min-height:38px; padding:7px 10px; border:1px solid var(--border); border-radius:6px; font-size:14px; color:var(--text); background:#fff; }
+    .form-group { display:flex; flex-direction:column; gap:5px; margin-bottom:12px; min-width:0; }
+    label.field-label { font-size:13px; font-weight:700; color:#334155; display:flex; align-items:center; justify-content:space-between; gap:6px; flex-wrap:wrap; }
+    input, select, textarea { min-height:38px; padding:7px 10px; border:1px solid var(--border); border-radius:6px; font-size:14px; color:var(--text); background:#fff; max-width:100%; min-width:0; }
     input:focus, select:focus, textarea:focus, button:focus-visible { outline:none; border-color:var(--primary); box-shadow:var(--focus-ring); }
     input.input-error { border-color:var(--danger); background:#fef2f2; }
     .money-input { text-align:right; font-variant-numeric:tabular-nums; }
     .money-readonly { background:#f1f5f9 !important; color:var(--muted) !important; cursor:not-allowed; font-weight:600 !important; }
 
     /* Buttons */
-    .btn { min-height:36px; padding:7px 13px; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; border:1px solid transparent; display:inline-flex; align-items:center; justify-content:center; gap:5px; user-select:none; transition:0.15s; }
+    .btn { min-height:36px; padding:7px 13px; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; border:1px solid transparent; display:inline-flex; align-items:center; justify-content:center; gap:5px; user-select:none; transition:0.15s; flex-shrink:0; }
     .btn-primary { background:var(--primary); color:#fff; } .btn-primary:hover { background:var(--primary-hover); }
     .btn-success { background:var(--success); color:#fff; } .btn-success:hover { filter:brightness(0.95); }
     .btn-danger { background:var(--danger-bg); color:var(--danger); border-color:var(--danger-border); }
@@ -145,33 +140,35 @@
     tr.row-makeup { background:#f0fdf4; }
     tr.row-extra { background:#eff6ff; }
     .weekday-tag { display:inline-block; min-width:56px; text-align:center; padding:2px 5px; border-radius:4px; font-size:11px; font-weight:700; background:#e2e8f0; color:#334155; }
-    .status-cell-wrap { display:flex; align-items:center; gap:5px; }
+    .status-cell-wrap { display:flex; align-items:center; gap:5px; width:100%; }
 
     /* Summary & Message Box */
     .summary-box { margin-bottom:14px; padding:12px 14px; background:var(--primary-light); border:1px solid #bfdbfe; border-radius:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
     .total-amount { font-size:20px; font-weight:800; color:var(--primary); font-variant-numeric:tabular-nums; }
     .msg-textarea { width:100%; min-height:255px; font-size:13.5px; line-height:1.55; padding:12px; background:#f8fafc; border:1px solid var(--border); border-radius:8px; resize:vertical; }
-    .chk-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:5px 8px; border-radius:6px; cursor:pointer; font-size:13px; }
+    .chk-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:5px 8px; border-radius:6px; cursor:pointer; font-size:13px; flex-wrap:wrap; }
     .chk-row.disabled { opacity:0.55; cursor:not-allowed; }
     .chk-hint { font-size:11px; color:var(--muted); background:#e2e8f0; padding:1px 6px; border-radius:10px; font-weight:500; }
 
-    /* Calendar View */
+    /* Calendar View (Desktop & Mobile Option 1) */
     .carry-banner-list { display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
     .carry-banner-item { padding:8px 12px; border-radius:6px; font-size:13px; display:flex; justify-content:space-between; align-items:center; font-weight:500; flex-wrap:wrap; gap:6px; }
     .carry-banner-item.unpaid { background:var(--danger-bg); color:var(--danger); border:1px solid var(--danger-border); border-left:4px solid var(--danger); }
     .carry-banner-item.paid { background:var(--success-bg); color:var(--success); border:1px solid var(--success-border); border-left:4px solid var(--success); }
 
-    .cal-scroll-wrap { overflow-x:auto; padding-bottom:4px; }
-    .cal-grid { display:grid; grid-template-columns:repeat(7,minmax(115px,1fr)); gap:6px; min-width:820px; }
-    .cal-head { background:#e2e8f0; padding:7px 4px; text-align:center; font-weight:700; font-size:12px; color:#1e293b; border-radius:6px; }
-    .cal-cell { min-height:118px; border:1px solid #cbd5e1; border-radius:8px; padding:6px; background:#fff; display:flex; flex-direction:column; gap:6px; position:relative; }
+    .cal-scroll-wrap { width:100%; overflow:hidden; }
+    .cal-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:6px; width:100%; }
+    .cal-head { background:#e2e8f0; padding:7px 2px; text-align:center; font-weight:700; font-size:12px; color:#1e293b; border-radius:6px; }
+    .cal-cell { min-height:118px; border:1px solid #cbd5e1; border-radius:8px; padding:6px; background:#fff; display:flex; flex-direction:column; gap:6px; position:relative; min-width:0; transition:0.15s; }
     .cal-cell.is-today { border:2px solid var(--primary); background:#f8faff; }
+    .cal-cell.is-selected { box-shadow:0 0 0 2.5px var(--primary); border-color:var(--primary); }
     .cal-cell.empty { background:#f8fafc; border-style:dashed; min-height:60px; opacity:0.65; }
-    .cal-cell-top { display:flex; justify-content:space-between; align-items:center; font-size:12px; font-weight:700; color:var(--muted); min-height:26px; }
+    .cal-cell-top { display:flex; justify-content:space-between; align-items:center; font-size:12px; font-weight:700; color:var(--muted); min-height:24px; }
     .today-pill { background:var(--primary); color:#fff; font-size:10px; padding:1px 5px; border-radius:8px; font-weight:700; margin-left:4px; }
-    .cal-add-btn { min-width:28px; min-height:28px; border:1px solid #cbd5e1; background:#f8fafc; color:var(--primary); cursor:pointer; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; }
+    .cal-add-btn { min-width:26px; min-height:26px; border:1px solid #cbd5e1; background:#f8fafc; color:var(--primary); cursor:pointer; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; }
     .cal-del-btn { min-width:26px; min-height:26px; border:none; background:transparent; color:var(--danger); cursor:pointer; border-radius:4px; display:inline-flex; align-items:center; justify-content:center; }
 
+    /* Desktop Session Cards inside Calendar Cell */
     .cal-sess-card { padding:6px; border-radius:6px; border:1px solid #cbd5e1; border-left-width:3.5px; font-size:11.5px; display:flex; flex-direction:column; gap:4px; background:#fff; }
     .cal-sess-card.st-normal { background:#f0fdf4; border-color:#bbf7d0; border-left-color:var(--success); }
     .cal-sess-card.st-absent { background:#fff1f2; border-color:#fecdd3; border-left-color:var(--danger); }
@@ -180,9 +177,27 @@
     .cal-sess-row { display:flex; justify-content:space-between; align-items:center; gap:4px; }
     .cal-mini-select, .cal-mini-input { min-height:28px; padding:2px 5px; font-size:11.5px; border-radius:4px; border:1px solid #cbd5e1; width:100%; background:#fff; }
 
+    /* Mobile Compact Pills inside Calendar Cell & Khung chi tiết bên dưới (Phương án 1) */
+    .cal-mobile-pills { display:none; flex-direction:column; gap:3px; width:100%; }
+    .cal-m-pill { font-size:10px; font-weight:700; padding:2px 3px; border-radius:4px; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.2; }
+    .cal-m-pill.st-normal { background:var(--success-bg); color:var(--success); border:1px solid var(--success-border); }
+    .cal-m-pill.st-absent { background:var(--danger-bg); color:var(--danger); border:1px solid var(--danger-border); }
+    .cal-m-pill.st-makeup { background:#d1fae5; color:#065f46; border:1px solid #6ee7b7; }
+    .cal-m-pill.st-extra { background:#dbeafe; color:#1e40af; border:1px solid #93c5fd; }
+
+    .mobile-day-detail-panel {
+      display:none; margin-top:12px; padding:14px; border-radius:10px;
+      background:#f8fafc; border:1.5px solid var(--primary);
+    }
+    .mobile-day-detail-header { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid #e2e8f0; }
+    .mobile-day-sess-item { background:#fff; border:1px solid #cbd5e1; border-left:4px solid var(--primary); border-radius:8px; padding:10px; margin-bottom:8px; display:flex; flex-direction:column; gap:8px; }
+    .mobile-day-sess-item.st-normal { border-left-color:var(--success); }
+    .mobile-day-sess-item.st-absent { border-left-color:var(--danger); background:#fff1f2; }
+    .mobile-day-sess-item.st-makeup { border-left-color:#059669; }
+
     /* Collapse & Modals */
     .collapse-box { border:1px solid #cbd5e1; border-radius:8px; background:#f8fafc; margin-bottom:12px; overflow:hidden; }
-    .collapse-header { padding:10px 12px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; user-select:none; background:#f1f5f9; gap:8px; }
+    .collapse-header { padding:10px 12px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; user-select:none; background:#f1f5f9; gap:8px; flex-wrap:wrap; }
     .collapse-body { padding:12px; border-top:1px solid #e2e8f0; display:none; background:#fff; }
     .collapse-box.open .collapse-body { display:block; }
     .rate-list { display:flex; flex-direction:column; gap:8px; margin-bottom:4px; }
@@ -191,17 +206,71 @@
     .weekday-card { border:1px solid #cbd5e1; border-radius:8px; padding:8px 10px; background:#f8fafc; display:flex; flex-direction:column; gap:6px; }
     .weekday-card.active { border-color:var(--primary); background:var(--primary-light); }
 
-    .modal-backdrop { position:fixed; inset:0; background:rgba(15,23,42,0.55); display:none; align-items:center; justify-content:center; z-index:200; padding:14px; }
+    .modal-backdrop { position:fixed; inset:0; background:rgba(15,23,42,0.55); display:none; align-items:center; justify-content:center; z-index:200; padding:12px; }
     .modal-backdrop.open { display:flex; }
-    .modal-box { background:#fff; border-radius:12px; max-width:640px; width:100%; max-height:92vh; overflow-y:auto; padding:20px; box-shadow:0 12px 32px rgba(0,0,0,0.25); }
+    .modal-box { background:#fff; border-radius:12px; max-width:640px; width:100%; max-height:90vh; overflow-y:auto; padding:18px; box-shadow:0 12px 32px rgba(0,0,0,0.25); }
     .modal-sm { max-width:460px; }
-    .toast { position:fixed; bottom:calc(20px + env(safe-area-inset-bottom)); right:20px; background:#0f172a; color:#fff; padding:12px 18px; border-radius:8px; font-size:14px; font-weight:600; opacity:0; pointer-events:none; transition:opacity 0.25s; z-index:999; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 14px rgba(0,0,0,0.2); }
+    .toast { position:fixed; bottom:calc(20px + env(safe-area-inset-bottom)); right:16px; left:16px; max-width:400px; margin:0 auto; background:#0f172a; color:#fff; padding:12px 16px; border-radius:8px; font-size:13.5px; font-weight:600; opacity:0; pointer-events:none; transition:opacity 0.25s; z-index:999; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 14px rgba(0,0,0,0.2); }
     .toast.show { opacity:1; }
+
+    /* ================= TỐI ƯU HOÀN TOÀN CHO ĐIỆN THOẠI (KHÔNG CUỘN NGANG) ================= */
+    @media (max-width: 768px) {
+      body { padding-bottom: calc(78px + env(safe-area-inset-bottom)); }
+      header { padding: calc(8px + env(safe-area-inset-top)) 12px 8px 12px; }
+      .brand span { font-size: 16px; }
+      .container { padding: 0 10px; margin: 10px auto; }
+      .card { padding: 12px; border-radius: 10px; }
+
+      /* Đưa 3 Tab xuống Bottom Navigation Bar chuẩn iOS */
+      .nav-tabs {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        background: rgba(255,255,255,0.96); backdrop-filter: blur(8px);
+        border-top: 1px solid var(--border);
+        padding: 6px 10px calc(6px + env(safe-area-inset-bottom)) 10px;
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+        z-index: 95; box-shadow: 0 -2px 10px rgba(0,0,0,0.06);
+      }
+      .tab-btn { flex-direction: column; gap: 2px; padding: 5px 4px; font-size: 11.5px; min-height: 48px; border: none; background: transparent; border-radius: 8px; }
+      #rad_tab_checkin:checked ~ header #tabBtn-checkin,
+      #rad_tab_billing:checked ~ header #tabBtn-billing,
+      #rad_tab_students:checked ~ header #tabBtn-students {
+        background: var(--primary-light); color: var(--primary); box-shadow: none;
+      }
+
+      /* Ngăn Safari iOS tự zoom khi chạm vào input/select */
+      input, select, textarea { font-size: 16px !important; }
+      .checkin-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; gap: 10px; }
+
+      /* Calendar Phương án 1 trên điện thoại: 7 cột vừa khít + Khung chi tiết bên dưới */
+      .cal-grid { gap: 3px; }
+      .cal-head { font-size: 11px; padding: 5px 1px; }
+      .cal-cell { min-height: 64px; padding: 4px 3px; gap: 3px; cursor: pointer; }
+      .cal-cell.empty { min-height: 44px; }
+      .cal-cell-top { font-size: 11px; min-height: 18px; justify-content: center; }
+      .today-pill, .cal-add-btn, .cal-sess-card { display: none !important; }
+      .cal-mobile-pills { display: flex; }
+      .mobile-day-detail-panel { display: block; }
+
+      /* Chuyển Bảng (Table) thành Thẻ xếp dọc (Stacked Cards) trên điện thoại */
+      #scheduleListContainer table, #scheduleListContainer thead, #scheduleListContainer tbody, #scheduleListContainer th, #scheduleListContainer td, #scheduleListContainer tr,
+      #view-students table, #view-students thead, #view-students tbody, #view-students th, #view-students td, #view-students tr {
+        display: block; width: 100%;
+      }
+      #scheduleListContainer thead, #view-students thead { display: none; }
+      #scheduleListContainer tr, #view-students tr {
+        border: 1px solid #cbd5e1; border-radius: 10px; padding: 10px; margin-bottom: 10px; background: #fff;
+      }
+      #scheduleListContainer td, #view-students td {
+        border: none; padding: 4px 0; text-align: left !important; width: 100% !important;
+      }
+      .rate-item { grid-template-columns: 1fr 1fr auto; gap: 6px; }
+      .toast { bottom: calc(74px + env(safe-area-inset-bottom)); }
+    }
   </style>
 </head>
 <body>
 
-<!-- TAB MẶC ĐỊNH KHI MỞ APP LÀ CHECK-IN (rad_tab_checkin checked) -->
 <input type="radio" name="main_tab_switch" id="rad_tab_checkin" class="tab-radio" checked>
 <input type="radio" name="main_tab_switch" id="rad_tab_billing" class="tab-radio">
 <input type="radio" name="main_tab_switch" id="rad_tab_students" class="tab-radio">
@@ -211,7 +280,7 @@
     <i data-icon="school" class="icon-lg"></i>
     <span>Quản lý dạy thêm</span>
   </div>
-  <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+  <div style="display:flex; align-items:center; gap:6px;">
     <div class="nav-tabs" role="tablist">
       <label for="rad_tab_checkin" id="tabBtn-checkin" class="tab-btn" onclick="switchTab('checkin')">
         <i data-icon="fact_check"></i>
@@ -227,7 +296,6 @@
       </label>
     </div>
 
-    <!-- Nút Đồng bộ Đám mây giữa iPhone & Máy tính -->
     <button type="button" id="cloudSyncHeaderBtn" class="btn btn-outline sync-btn" onclick="openCloudSyncModal()" title="Đồng bộ dữ liệu iPhone & Máy tính">
       <i data-icon="cloud_off" class="icon-sm" id="cloudSyncHeaderIcon"></i>
       <span id="cloudSyncHeaderText">Đồng bộ</span>
@@ -267,19 +335,14 @@
   <section id="view-checkin">
     <div class="card">
       <div class="card-header">
-        <div>
-          <div class="card-title">
-            <i data-icon="fact_check" style="color:var(--primary);"></i>
-            <span id="checkinHeaderTitle">Check-in buổi học hôm nay</span>
-          </div>
-          <div style="font-size:13px; color:var(--muted); margin-top:2px;">
-            Ưu tiên hiển thị học viên có lịch học hôm nay. Học viên đã check-in hôm nay sẽ tự động ẩn đi.
-          </div>
+        <div class="card-title">
+          <i data-icon="fact_check" style="color:var(--primary);"></i>
+          <span id="checkinHeaderTitle">Check-in buổi học hôm nay</span>
         </div>
-        <div style="display:flex; gap:8px; align-items:center;">
+        <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
           <button type="button" class="btn btn-outline btn-sm" onclick="pullFromCloud(true)" id="btnQuickPullCloud" style="display:none;">
             <i data-icon="sync" class="icon-sm"></i>
-            <span>Tải dữ liệu mới nhất</span>
+            <span>Tải mới</span>
           </button>
           <button type="button" class="btn btn-outline btn-sm" onclick="switchTab('billing')">
             <i data-icon="calendar_month" class="icon-sm"></i>
@@ -294,11 +357,11 @@
 
   <!-- ================= MÀN HÌNH 1: HỌC PHÍ & LỊCH HỌC CHI TIẾT ================= -->
   <section id="view-billing">
-    <div class="card" style="margin-bottom:14px; padding:12px 16px;">
+    <div class="card" style="margin-bottom:14px; padding:12px 14px;">
       <div class="form-row" style="margin-bottom:0; align-items:end;">
         <div class="form-group" style="margin-bottom:0;">
           <label class="field-label" for="billingStudentSelect">Học viên</label>
-          <select id="billingStudentSelect" onchange="onStudentOrMonthChange()"></select>
+          <select id="billingStudentSelect" onchange="onStudentOrMonthChange()" style="width:100%;"></select>
         </div>
 
         <div class="form-group" style="margin-bottom:0;">
@@ -306,11 +369,11 @@
             <span>Tháng</span>
             <span id="monthStatusBadge" class="badge badge-current">Tháng hiện tại</span>
           </label>
-          <div style="display:flex; gap:4px; align-items:center;">
+          <div style="display:grid; grid-template-columns:auto minmax(0,1fr) auto auto; gap:4px; align-items:center; width:100%;">
             <button type="button" class="btn btn-outline btn-icon-only" onclick="stepMonth(-1)" title="Tháng trước">
               <i data-icon="chevron_left" class="icon-sm"></i>
             </button>
-            <input type="month" id="billingMonthInput" onchange="onStudentOrMonthChange()" style="flex:1;">
+            <input type="month" id="billingMonthInput" onchange="onStudentOrMonthChange()" style="width:100%;">
             <button type="button" class="btn btn-outline btn-icon-only" onclick="stepMonth(1)" title="Tháng sau">
               <i data-icon="chevron_right" class="icon-sm"></i>
             </button>
@@ -319,7 +382,7 @@
         </div>
 
         <div style="display:flex; gap:8px;">
-          <button type="button" class="btn btn-primary" onclick="nextStudent()">
+          <button type="button" class="btn btn-primary" style="width:100%;" onclick="nextStudent()">
             <i data-icon="skip_next"></i>
             <span>Học viên tiếp theo</span>
           </button>
@@ -328,7 +391,7 @@
     </div>
 
     <div class="split-layout">
-      <!-- BÊN TRÁI (70%): LỊCH HỌC CHI TIẾT -->
+      <!-- BÊN TRÁI: LỊCH HỌC CHI TIẾT -->
       <div class="card">
         <div class="card-header">
           <div>
@@ -339,7 +402,7 @@
             <div id="studentRateBanner" style="font-size:12.5px; color:var(--muted); margin-top:3px;"></div>
           </div>
           <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-            <div style="display:flex; gap:4px; margin-right:4px;">
+            <div style="display:flex; gap:4px;">
               <button type="button" id="btnViewCalendar" class="btn btn-outline btn-sm active" onclick="setScheduleViewMode('calendar')">
                 <i data-icon="calendar_view_month" class="icon-sm"></i>
                 <span>Lịch</span>
@@ -357,8 +420,8 @@
         </div>
 
         <div class="default-schedule-banner">
-          <div id="defaultScheduleText"><b>Lịch cố định hàng tuần:</b> Chưa có học viên</div>
-          <div style="display:flex; gap:6px;">
+          <div id="defaultScheduleText" style="flex:1; min-width:0;"><b>Lịch cố định hàng tuần:</b> Chưa có học viên</div>
+          <div style="display:flex; gap:6px; flex-shrink:0;">
             <button type="button" class="btn btn-outline btn-icon-only" onclick="requestResetMonthToDefault()" title="Reset lịch mặc định">
               <i data-icon="restart_alt" class="icon-sm"></i>
             </button>
@@ -369,24 +432,24 @@
         </div>
 
         <div class="legend-bar">
-          <span style="font-weight:700; color:#334155;">Chú giải:</span>
           <span class="legend-item"><span class="legend-dot" style="background:var(--success);"></span>Học theo lịch</span>
-          <span class="legend-item"><span class="legend-dot" style="background:var(--danger);"></span>Nghỉ / Nợ chưa bù</span>
+          <span class="legend-item"><span class="legend-dot" style="background:var(--danger);"></span>Nghỉ / Chưa bù</span>
           <span class="legend-item"><span class="legend-dot" style="background:#059669;"></span>Học bù / Đã bù</span>
-          <span class="legend-item"><span class="legend-dot" style="background:var(--primary);"></span>Học bổ sung</span>
-          <span class="legend-item"><i data-icon="check_circle" class="icon-sm" style="color:var(--success);"></i>Đã Check-in (Bấm để bật/tắt)</span>
+          <span class="legend-item"><span class="legend-dot" style="background:var(--primary);"></span>Bổ sung</span>
         </div>
 
-        <!-- VIEW DẠNG CALENDAR -->
+        <!-- VIEW DẠNG CALENDAR (PHƯƠNG ÁN 1: LỊCH 7 CỘT + KHUNG CHI TIẾT NGÀY BÊN DƯỚI TRÊN MOBILE) -->
         <div id="scheduleCalendarContainer">
           <div id="calendarCarryOverBanner" class="carry-banner-list"></div>
           <div class="cal-scroll-wrap">
             <div id="calendarGrid" class="cal-grid"></div>
           </div>
+          <!-- Khung chi tiết ngày đang chọn dành cho Điện thoại (Phương án 1) -->
+          <div id="mobileDayDetailBox" class="mobile-day-detail-panel"></div>
         </div>
 
         <!-- VIEW DẠNG BẢNG DANH SÁCH -->
-        <div id="scheduleListContainer" style="overflow-x:auto; display:none;">
+        <div id="scheduleListContainer" style="display:none;">
           <table>
             <thead>
               <tr>
@@ -404,7 +467,7 @@
         </div>
       </div>
 
-      <!-- BÊN PHẢI (30%): TỔNG KẾT & TIN NHẮN GỬI PHỤ HUYNH -->
+      <!-- BÊN PHẢI: TỔNG KẾT & TIN NHẮN GỬI PHỤ HUYNH -->
       <div class="card">
         <div class="summary-box">
           <div>
@@ -468,7 +531,7 @@
           <span>Thêm mới</span>
         </button>
       </div>
-      <div style="overflow-x:auto;">
+      <div>
         <table>
           <thead>
             <tr>
@@ -557,7 +620,7 @@
   </div>
 </div>
 
-<!-- POP-UP MODAL ĐỒNG BỘ DỮ LIỆU ĐÁM MÂY (IPHONE ↔ MÁY TÍNH) -->
+<!-- POP-UP MODAL ĐỒNG BỘ DỮ LIỆU ĐÁM MÂY -->
 <div class="modal-backdrop" id="cloudSyncModal" onclick="onBackdropClick(event, 'cloudSyncModal')">
   <div class="modal-box modal-sm" role="dialog" aria-modal="true">
     <div class="card-header" style="margin-bottom:12px;">
@@ -593,7 +656,7 @@
       </div>
     </div>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding-top:12px; border-top:1px solid #e2e8f0;">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding-top:12px; border-top:1px solid #e2e8f0; flex-wrap:wrap;">
       <button type="button" class="btn btn-danger btn-sm" onclick="disconnectCloudSync()">Ngắt kết nối</button>
       <div style="display:flex; gap:8px;">
         <button type="button" class="btn btn-outline" onclick="closeCloudSyncModal()">Đóng</button>
@@ -627,12 +690,11 @@
 </div>
 
 <script>
-  // ================= BỘ ICON GOOGLE MATERIAL INLINE SVG (KHÔNG BAO GIỜ LỖI TRÊN IPHONE) =================
   var SVG_PATHS = {
     school: '<path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3 1 9l11 6 9-4.91V17h2V9L12 3z"/>',
     fact_check: '<path d="M20 3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14H5v-2h6v2zm0-4H5v-2h6v2zm0-4H5V7h6v2zm3.82 6L12 12.16l1.41-1.41 1.41 1.42L17.99 9l1.42 1.42L14.82 15z"/>',
     payments: '<path d="M19 14V6c0-1.1-.9-2-2-2H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zm-9-1c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm13-6v11c0 1.1-.9 2-2 2H4v-2h17V7h2z"/>',
-    manage_accounts: '<path d="M10 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h9.5v-2.09c-.47-.83-.5-1.91-.5-1.91H10zm9.43 4.02c.36-.24.57-.64.57-1.07v-.9c0-.43-.21-.83-.57-1.07l-1.07-.71c.04-.32.04-.64 0-.96l1.07-.71c.36-.24.57-.64.57-1.07v-.9c0-.43-.21-.83-.57-1.07l-1.54-1.03c-.36-.24-.82-.28-1.22-.1l-1.18.53c-.5-.38-1.05-.69-1.65-.92l-.25-1.26c-.09-.42-.46-.72-.89-.72h-1.8c-.43 0-.8.3-.89.72l-.25 1.26c-.6.23-1.15.54-1.65.92l-1.18-.53c-.4-.18-.86-.14-1.22.1l-1.54 1.03c-.36.24-.57.64-.57 1.07v.9c0 .43.21.83.57 1.07l1.07.71c-.04.32-.04.64 0 .96l-1.07.71c-.36.24-.57.64-.57 1.07v.9c0 .43.21.83.57 1.07l1.54 1.03c.36.24.82.28 1.22.1l1.18-.53c.5.38 1.05.69 1.65.92l.25 1.26c.09.42.46.72.89.72h1.8c.43 0 .8-.3.89-.72l.25-1.26c.6-.23 1.15-.54 1.65-.92l1.18.53c.4.18.86.14 1.22-.1l1.54-1.03zM16 18c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>',
+    manage_accounts: '<path d="M10 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h9.5v-2.09c-.47-.83-.5-1.91-.5-1.91H10zm9.43 4.02c.36-.24.57-.64.57-1.07v-.9c0-.43-.21-.83-.57-1.07l-1.07-.71c.04-.32.04-.64 0-.96l1.07-.71c.36-.24.57-.64.57-1.07v-.9c0-.43-.21-.83-.57-1.07l-1.54-1.03c-.36-.24-.82-.28-1.22-.1l-1.18.53c-.5-.38-1.05-.69-1.65-.92l-.25-1.26c-.09-.42-.46-.72-.89-.72h-1.8c-.43 0-.8.3-.89.72l-.25 1.26c-.6.23-1.15.54-1.65.92l-1.18-.53c-.4-.18-.86-.14-1.22.1l-1.54 1.03c-.36.24-.57.64-.57 1.07v.9c0 .43.21.83.57 1.07l1.07.71c-.04.32-.04.64 0 .96l-1.07.71c-.36.24-.57.64-.57 1.07v.9c0 .43.21.83.57 1.07l1.54 1.03c.36.24.82.28 1.22.1l1.18-.53c.5.38 1.05.69 1.65.92l.25 1.26c.09.42-.46.72-.89.72h1.8c.43 0 .8-.3.89-.72l.25-1.26c.6-.23 1.15-.54 1.65-.92l1.18.53c.4.18.86.14 1.22-.1l1.54-1.03zM16 18c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>',
     more_horiz: '<path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>',
     download: '<path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>',
     upload_file: '<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11 8 15.01z"/>',
@@ -707,6 +769,7 @@
   var syncConfig = { token: '', gistId: '' };
   var rateRowCounter = 0;
   var scheduleViewMode = 'calendar';
+  var selectedCalendarDate = ''; // Ngày đang chọn trên Calendar Mobile (Phương án 1)
   var pendingConfirmAction = null;
   var pendingCancelAction = null;
 
@@ -754,6 +817,7 @@
   }
   function jumpToCurrentMonth() {
     document.getElementById('billingMonthInput').value = getCurrentMonthStr();
+    selectedCalendarDate = getTodayDateStr();
     onStudentOrMonthChange();
   }
 
@@ -976,7 +1040,7 @@
             'Accept': 'application/vnd.github.v3+json',
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ description: 'Database 동 bộ Quản Lý Dạy Thêm (iPhone & PC)', public: false, files: filesObj })
+          body: JSON.stringify({ description: 'Database Quản Lý Dạy Thêm (iPhone & PC)', public: false, files: filesObj })
         })
         .then(function(r) { return r.json(); })
         .then(function(created) {
@@ -996,7 +1060,7 @@
 
   function pushToCloud() {
     if (!syncConfig.token || !syncConfig.gistId) return;
-    updateSyncHeaderUI('syncing', 'Đang lưu Cloud...');
+    updateSyncHeaderUI('syncing', 'Đang lưu...');
     var filesObj = {};
     filesObj[GIST_FILENAME] = { content: JSON.stringify(appData, null, 2) };
     fetch('https://api.github.com/gists/' + syncConfig.gistId, {
@@ -1025,7 +1089,6 @@
       if (gist && gist.files && gist.files[GIST_FILENAME] && gist.files[GIST_FILENAME].content) {
         var remoteData = JSON.parse(gist.files[GIST_FILENAME].content);
         if (remoteData && Array.isArray(remoteData.students)) {
-          // Nếu máy local đang trống học viên nhưng có dữ liệu local nhiều hơn và remote rỗng thì đẩy local lên
           if (remoteData.students.length === 0 && appData.students.length > 0) {
             pushToCloud();
           } else {
@@ -1045,7 +1108,6 @@
     });
   }
 
-  // Tự động đồng bộ khi mở lại màn hình trên iPhone hoặc chuyển tab trình duyệt
   document.addEventListener('visibilitychange', function() {
     if (document.visibilityState === 'visible' && syncConfig.token && syncConfig.gistId) {
       pullFromCloud(false);
@@ -1137,13 +1199,11 @@
 
     var scheduledTodayList = [];
     var otherStudentsList = [];
-    var checkedInCountToday = 0;
 
     for (var i = 0; i < appData.students.length; i++) {
       var stu = appData.students[i];
       var logs = ensureMonthInitialized(stu, currentMonth);
 
-      // Kiểm tra các buổi trong ngày hôm nay của học viên
       var todaySessionIdx = -1;
       var alreadyCheckedInToday = false;
       for (var j = 0; j < logs.length; j++) {
@@ -1158,11 +1218,7 @@
         }
       }
 
-      // Nếu học viên đã được check-in hôm nay -> Ẩn khỏi màn hình Check-in
-      if (alreadyCheckedInToday) {
-        checkedInCountToday++;
-        continue;
-      }
+      if (alreadyCheckedInToday) continue;
 
       if (todaySessionIdx !== -1) {
         scheduledTodayList.push({ stu: stu, sessionIdx: todaySessionIdx, session: logs[todaySessionIdx] });
@@ -1184,8 +1240,7 @@
       return;
     }
 
-    // 1. NHÓM ƯU TIÊN: HỌC VIÊN CÓ LỊCH HỌC HÔM NAY
-    html += '<div class="section-sub-label">' + svgIcon('calendar_month', 'icon-sm', 'color:var(--primary);') + '<span>Học viên có lịch học hôm nay (' + scheduledTodayList.length + ')</span></div>';
+    html += '<div class="section-sub-label">' + svgIcon('calendar_month', 'icon-sm', 'color:var(--primary);') + '<span>Có lịch học hôm nay (' + scheduledTodayList.length + ')</span></div>';
     if (scheduledTodayList.length === 0) {
       html += '<div style="padding:14px; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px; font-size:13.5px; color:var(--muted);">Không còn học viên nào có lịch cố định hôm nay chờ check-in.</div>';
     } else {
@@ -1196,9 +1251,8 @@
       html += '</div>';
     }
 
-    // 2. NHÓM HỌC VIÊN KHÁC (ĐỂ CHECK-IN HỌC BÙ / HỌC BỔ SUNG ĐỘT XUẤT)
     if (otherStudentsList.length > 0) {
-      html += '<div class="section-sub-label" style="margin-top:22px;">' + svgIcon('group', 'icon-sm') + '<span>Học viên khác — Check-in học bù / bổ sung (' + otherStudentsList.length + ')</span></div>';
+      html += '<div class="section-sub-label" style="margin-top:20px;">' + svgIcon('group', 'icon-sm') + '<span>Học viên khác — Học bù / Bổ sung (' + otherStudentsList.length + ')</span></div>';
       html += '<div class="checkin-grid">';
       for (var o = 0; o < otherStudentsList.length; o++) {
         html += buildCheckinCardHTML(otherStudentsList[o].stu, false, null);
@@ -1290,7 +1344,6 @@
       if (stu.rates[r].label === chosenDur) { chosenPrice = Number(stu.rates[r].price); break; }
     }
 
-    // Kiểm tra nếu chọn Học bù nhưng không còn nợ tháng trước
     if (chosenStatus === 'makeup') {
       var carryOvers = getCarryOverSessions(stu, currentMonth);
       var currentMakeups = 0;
@@ -1351,7 +1404,6 @@
     showToast('Đã ghi nhận ' + stu.name + ' nghỉ hôm nay', 'event_busy');
   }
 
-  // Bổ sung hoặc bỏ phần tick Check-in ở màn hình chi tiết lịch học
   function toggleSessionCheckin(idx) {
     var stu = getSelectedStudent();
     var list = appData.monthlyLogs[getLogKey()];
@@ -1485,6 +1537,24 @@
     }
   }
 
+  // Đảm bảo selectedCalendarDate luôn thuộc tháng đang xem
+  function ensureSelectedDateInMonth(monthStr, sessions) {
+    if (selectedCalendarDate && selectedCalendarDate.indexOf(monthStr) === 0) return;
+    var todayStr = getTodayDateStr();
+    if (todayStr.indexOf(monthStr) === 0) {
+      selectedCalendarDate = todayStr;
+    } else if (sessions && sessions.length > 0) {
+      selectedCalendarDate = sessions[0].date;
+    } else {
+      selectedCalendarDate = monthStr + '-01';
+    }
+  }
+
+  function selectCalendarDateOnMobile(fullDate) {
+    selectedCalendarDate = fullDate;
+    renderCalendarView();
+  }
+
   function onStudentOrMonthChange() {
     var stu = getSelectedStudent();
     var monthStr = getSelectedMonthStr();
@@ -1498,6 +1568,7 @@
       document.getElementById('sessionTableBody').innerHTML = '<tr><td colspan="7" style="text-align:center; padding:24px; color:var(--muted);">Chưa có dữ liệu học viên.</td></tr>';
       document.getElementById('calendarCarryOverBanner').innerHTML = '';
       document.getElementById('calendarGrid').innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:24px; color:var(--muted);">Chưa có dữ liệu học viên.</div>';
+      document.getElementById('mobileDayDetailBox').innerHTML = '';
       document.getElementById('summaryBreakdown').textContent = 'Tổng số buổi học: 0 buổi';
       document.getElementById('summarySubDetail').textContent = '';
       document.getElementById('summaryTotalAmount').textContent = '0 đ';
@@ -1523,7 +1594,8 @@
     document.getElementById('defaultScheduleText').innerHTML =
       '<b>Lịch cố định hàng tuần của ' + stu.name + ':</b> ' + (schedDesc.length > 0 ? schedDesc.join(', ') : 'Chưa chọn thứ cố định');
 
-    ensureMonthInitialized(stu, monthStr);
+    var sessions = ensureMonthInitialized(stu, monthStr);
+    ensureSelectedDateInMonth(monthStr, sessions);
     refreshBillingCalculation();
   }
 
@@ -1609,11 +1681,9 @@
       trCarry.innerHTML =
         '<td style="font-weight:700;">' + svgIcon('history', 'icon-sm') + '</td>' +
         '<td><div style="display:flex; align-items:center; gap:6px;"><span class="weekday-tag">' + wdCarry + '</span><span>' + formatShortDate(co.fromDate) + ' (Tháng trước)</span></div></td>' +
-        '<td><b>Ca ' + co.duration + '</b></td>' +
-        '<td style="text-align:right; font-weight:700; padding-right:16px;">' + formatMoney(co.price) + '</td>' +
+        '<td><b>Ca ' + co.duration + ' (' + formatMoney(co.price) + 'đ)</b></td>' +
         '<td><div class="status-cell-wrap">' + statusBadgeHtml + '</div></td>' +
-        '<td style="text-align:center; color:var(--muted);">—</td>' +
-        '<td style="text-align:center; color:var(--muted);">—</td>';
+        '<td colspan="3" style="color:var(--muted); font-size:12px;">Tự động đối soát từ tháng trước</td>';
       tbody.appendChild(trCarry);
     }
 
@@ -1631,14 +1701,14 @@
       var optsHtml = '';
       for (var r = 0; r < stu.rates.length; r++) {
         var rate = stu.rates[r];
-        optsHtml += '<option value="' + rate.label + '" ' + (rate.label === sess.duration ? 'selected' : '') + '>' + rate.label + '</option>';
+        optsHtml += '<option value="' + rate.label + '" ' + (rate.label === sess.duration ? 'selected' : '') + '>Ca ' + rate.label + '</option>';
       }
 
       var weekdayLabel = getWeekdayNameFromDateStr(sess.date);
       var isZeroed = (!isDef && sess.status === 'makeup') || (isDef && sess.status === 'absent' && opts.deductCurrentAbsent);
       var priceCellHtml = isZeroed
-        ? '<input type="text" class="money-input money-readonly" value="0 (' + (!isDef ? 'Cấn trừ' : 'Đã trừ') + ')" readonly style="width:115px; padding:5px 8px;">'
-        : '<input type="text" inputmode="numeric" class="money-input" value="' + formatMoney(sess.price) + '" oninput="onMoneyInputKeyup(this)" onchange="onSessionPriceChange(' + i + ', this.value)" style="width:115px; padding:5px 8px; font-weight:700; color:#1e40af;">';
+        ? '<input type="text" class="money-input money-readonly" value="0 (' + (!isDef ? 'Cấn trừ' : 'Đã trừ') + ')" readonly style="width:100%; padding:5px 8px;">'
+        : '<input type="text" inputmode="numeric" class="money-input" value="' + formatMoney(sess.price) + '" oninput="onMoneyInputKeyup(this)" onchange="onSessionPriceChange(' + i + ', this.value)" style="width:100%; padding:5px 8px; font-weight:700; color:#1e40af;">';
 
       var statusSelectHtml = '';
       var sIcon = 'check_circle', sColor = 'color:var(--success);';
@@ -1667,13 +1737,14 @@
         '</button>';
 
       tr.innerHTML =
-        '<td style="font-weight:700; color:var(--muted);">' + (i + 1) + '</td>' +
-        '<td><div style="display:flex; align-items:center; gap:6px;"><span class="weekday-tag">' + weekdayLabel + '</span><input type="date" value="' + sess.date + '" onchange="onSessionDateChange(' + i + ', this.value)" style="width:128px; padding:5px;"></div></td>' +
-        '<td><select onchange="onSessionDurationChange(' + i + ', this.value)" style="width:94px; padding:5px; font-weight:600;">' + optsHtml + '</select></td>' +
+        '<td style="font-weight:700; color:var(--muted);">Buổi #' + (i + 1) + '</td>' +
+        '<td><div style="display:flex; align-items:center; gap:6px;"><span class="weekday-tag">' + weekdayLabel + '</span><input type="date" value="' + sess.date + '" onchange="onSessionDateChange(' + i + ', this.value)" style="flex:1; padding:5px;"></div></td>' +
+        '<td><select onchange="onSessionDurationChange(' + i + ', this.value)" style="width:100%; padding:5px; font-weight:600;">' + optsHtml + '</select></td>' +
         '<td>' + priceCellHtml + '</td>' +
         '<td><div class="status-cell-wrap">' + svgIcon(sIcon, '', sColor) + statusSelectHtml + '</div></td>' +
-        '<td style="text-align:center;">' + checkinBtnHtml + '</td>' +
-        '<td style="text-align:center;"><button type="button" class="btn btn-danger btn-sm btn-icon-only" onclick="requestRemoveSessionRow(' + i + ')" title="Xóa buổi này">' + svgIcon('delete') + '</button></td>';
+        '<td><div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">' + checkinBtnHtml +
+          '<button type="button" class="btn btn-danger btn-sm btn-icon-only" onclick="requestRemoveSessionRow(' + i + ')" title="Xóa buổi này">' + svgIcon('delete') + '</button></div></td>' +
+        '<td style="display:none;"></td>';
       tbody.appendChild(tr);
     }
   }
@@ -1684,11 +1755,14 @@
     var todayStr = getTodayDateStr();
     var bannerEl = document.getElementById('calendarCarryOverBanner');
     var gridEl = document.getElementById('calendarGrid');
+    var detailBoxEl = document.getElementById('mobileDayDetailBox');
     bannerEl.innerHTML = '';
     gridEl.innerHTML = '';
+    if (detailBoxEl) detailBoxEl.innerHTML = '';
     if (!stu) return;
 
     var sessions = appData.monthlyLogs[getLogKey()] || [];
+    ensureSelectedDateInMonth(monthStr, sessions);
     var carryOvers = getCarryOverSessions(stu, monthStr);
     var opts = getMonthOptions(stu.id, monthStr);
 
@@ -1698,17 +1772,17 @@
       div.className = 'carry-banner-item ' + (co.isCompensated ? 'paid' : 'unpaid');
       var stText = co.isCompensated
         ? 'Đã bù (ngày ' + formatShortDate(co.compensatedDate) + ')'
-        : (opts.deductUncompensated ? 'Chưa bù (Đã trừ -' + formatMoney(co.price) + 'đ vào tháng này)' : 'Chưa bù (Cần học bù trong tháng)');
+        : (opts.deductUncompensated ? 'Chưa bù (Đã trừ -' + formatMoney(co.price) + 'đ)' : 'Chưa bù (Cần học bù)');
       div.innerHTML =
         '<div style="display:flex; align-items:center; gap:6px;">' +
           svgIcon(co.isCompensated ? 'task_alt' : 'error', 'icon-sm') +
-          '<span><b>Buổi nghỉ tháng trước:</b> Ngày ' + formatShortDate(co.fromDate) + ' (' + getWeekdayNameFromDateStr(co.fromDate) + ') — Ca ' + co.duration + ' (' + formatMoney(co.price) + 'đ)</span>' +
+          '<span><b>Nghỉ tháng trước:</b> ' + formatShortDate(co.fromDate) + ' (' + getWeekdayNameFromDateStr(co.fromDate) + ') — Ca ' + co.duration + ' (' + formatMoney(co.price) + 'đ)</span>' +
         '</div>' +
         '<span><b>' + stText + '</b></span>';
       bannerEl.appendChild(div);
     }
 
-    var dayHeaders = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'];
+    var dayHeaders = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
     for (var h = 0; h < dayHeaders.length; h++) {
       var hEl = document.createElement('div');
       hEl.className = 'cal-head';
@@ -1733,23 +1807,43 @@
       var mm = month < 10 ? '0' + month : String(month);
       var fullDate = year + '-' + mm + '-' + dd;
       var isToday = (fullDate === todayStr);
+      var isSelected = (fullDate === selectedCalendarDate);
 
       var cell = document.createElement('div');
-      cell.className = 'cal-cell' + (isToday ? ' is-today' : '');
+      cell.className = 'cal-cell' + (isToday ? ' is-today' : '') + (isSelected ? ' is-selected' : '');
+      (function(dateToSelect) {
+        cell.onclick = function(ev) {
+          if (ev.target && (ev.target.tagName === 'SELECT' || ev.target.tagName === 'INPUT' || ev.target.tagName === 'BUTTON' || ev.target.closest('button'))) return;
+          selectCalendarDateOnMobile(dateToSelect);
+        };
+      })(fullDate);
 
       var topBar = document.createElement('div');
       topBar.className = 'cal-cell-top';
       topBar.innerHTML =
-        '<span>' + d + '/' + mm + (isToday ? '<span class="today-pill">Hôm nay</span>' : '') + '</span>' +
+        '<span>' + d + (isToday ? '<span class="today-pill">Hôm nay</span>' : '') + '</span>' +
         '<button type="button" class="cal-add-btn" onclick="requestAddSessionOnDate(\'' + fullDate + '\')" title="Thêm buổi ngày ' + dd + '/' + mm + '">' +
           svgIcon('add', 'icon-sm') +
         '</button>';
       cell.appendChild(topBar);
 
+      var mobilePillsWrap = document.createElement('div');
+      mobilePillsWrap.className = 'cal-mobile-pills';
+
       for (var sIdx = 0; sIdx < sessions.length; sIdx++) {
         if (sessions[sIdx].date === fullDate) {
           var sess = sessions[sIdx];
           var isDef = (sess.isDefault !== false);
+
+          // 1. Pill thu gọn cho Mobile Calendar (Phương án 1)
+          var mPill = document.createElement('div');
+          mPill.className = 'cal-m-pill st-' + sess.status;
+          var shortText = sess.status === 'absent' ? 'Nghỉ' : sess.duration;
+          if (sess.checkedIn) shortText += ' ✓';
+          mPill.textContent = shortText;
+          mobilePillsWrap.appendChild(mPill);
+
+          // 2. Card đầy đủ cho Desktop Calendar
           var card = document.createElement('div');
           card.className = 'cal-sess-card st-' + sess.status;
 
@@ -1790,8 +1884,86 @@
           cell.appendChild(card);
         }
       }
+
+      cell.appendChild(mobilePillsWrap);
       gridEl.appendChild(cell);
     }
+
+    renderMobileSelectedDayPanel(stu, sessions, opts);
+  }
+
+  // Render Khung Chi Tiết Ngày Đang Chọn ở bên dưới tờ lịch trên Điện thoại (Phương án 1)
+  function renderMobileSelectedDayPanel(stu, sessions, opts) {
+    var detailBoxEl = document.getElementById('mobileDayDetailBox');
+    if (!detailBoxEl || !stu || !selectedCalendarDate) return;
+
+    var wdName = getWeekdayNameFromDateStr(selectedCalendarDate);
+    var dayMatched = [];
+    for (var i = 0; i < sessions.length; i++) {
+      if (sessions[i].date === selectedCalendarDate) {
+        dayMatched.push({ idx: i, sess: sessions[i] });
+      }
+    }
+
+    var html =
+      '<div class="mobile-day-detail-header">' +
+        '<div>' +
+          '<div style="font-size:14px; font-weight:800; color:var(--primary);">' + wdName + ', ngày ' + formatShortDate(selectedCalendarDate) + '/' + selectedCalendarDate.slice(0, 4) + '</div>' +
+          '<div style="font-size:11.5px; color:var(--muted);">Chạm vào ngày bất kỳ trên lịch để xem hoặc sửa</div>' +
+        '</div>' +
+        '<button type="button" class="btn btn-primary btn-sm" onclick="requestAddSessionOnDate(\'' + selectedCalendarDate + '\')">' +
+          svgIcon('add', 'icon-sm') + '<span>Thêm buổi</span>' +
+        '</button>' +
+      '</div>';
+
+    if (dayMatched.length === 0) {
+      html += '<div style="font-size:13px; color:var(--muted); text-align:center; padding:10px 4px;">Không có buổi học nào trong ngày này. Bấm <b>"+ Thêm buổi"</b> ở góc phải nếu muốn thêm.</div>';
+    } else {
+      for (var m = 0; m < dayMatched.length; m++) {
+        var sIdx = dayMatched[m].idx;
+        var sess = dayMatched[m].sess;
+        var isDef = (sess.isDefault !== false);
+
+        var rateOpts = '';
+        for (var r = 0; r < stu.rates.length; r++) {
+          var rt = stu.rates[r];
+          rateOpts += '<option value="' + rt.label + '" ' + (rt.label === sess.duration ? 'selected' : '') + '>Ca ' + rt.label + '</option>';
+        }
+
+        var stOpts = isDef
+          ? '<option value="normal" ' + (sess.status === 'normal' ? 'selected' : '') + '>Học theo lịch</option>' +
+            '<option value="absent" ' + (sess.status === 'absent' ? 'selected' : '') + '>Nghỉ</option>'
+          : '<option value="makeup" ' + (sess.status === 'makeup' ? 'selected' : '') + '>Học bù</option>' +
+            '<option value="extra" ' + (sess.status === 'extra' ? 'selected' : '') + '>Học bổ sung</option>';
+
+        var isZeroed = (!isDef && sess.status === 'makeup') || (isDef && sess.status === 'absent' && opts.deductCurrentAbsent);
+        var priceInputHtml = isZeroed
+          ? '<input type="text" class="money-input money-readonly" value="0 (' + (!isDef ? 'Cấn trừ' : 'Đã trừ') + ')" readonly style="width:100%;">'
+          : '<input type="text" inputmode="numeric" class="money-input" style="font-weight:700; color:#1e40af; width:100%;" value="' + formatMoney(sess.price) + '" oninput="onMoneyInputKeyup(this)" onchange="onSessionPriceChange(' + sIdx + ', this.value)">';
+
+        var isChk = Boolean(sess.checkedIn);
+
+        html +=
+          '<div class="mobile-day-sess-item st-' + sess.status + '">' +
+            '<div style="display:grid; grid-template-columns:1fr 1.2fr; gap:8px;">' +
+              '<div><label style="font-size:11px; color:var(--muted); font-weight:700;">Giờ học</label><select onchange="onSessionDurationChange(' + sIdx + ', this.value)" style="width:100%; font-weight:700;">' + rateOpts + '</select></div>' +
+              '<div><label style="font-size:11px; color:var(--muted); font-weight:700;">Số tiền (VNĐ)</label>' + priceInputHtml + '</div>' +
+            '</div>' +
+            '<div><label style="font-size:11px; color:var(--muted); font-weight:700;">Trạng thái buổi học</label><select onchange="onSessionStatusChange(' + sIdx + ', this.value)" style="width:100%;">' + stOpts + '</select></div>' +
+            '<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding-top:4px;">' +
+              '<button type="button" class="chk-in-toggle ' + (isChk ? 'checked' : '') + '" style="flex:1; justify-content:center; min-height:36px;" onclick="toggleSessionCheckin(' + sIdx + ')">' +
+                svgIcon(isChk ? 'check_circle' : 'radio_button_unchecked', 'icon-sm') +
+                '<span>' + (isChk ? 'Đã Check-in' : 'Bấm Check-in') + '</span>' +
+              '</button>' +
+              '<button type="button" class="btn btn-danger btn-icon-only" onclick="requestRemoveSessionRow(' + sIdx + ')" title="Xóa buổi này">' +
+                svgIcon('delete', 'icon-sm') +
+              '</button>' +
+            '</div>' +
+          '</div>';
+      }
+    }
+
+    detailBoxEl.innerHTML = html;
   }
 
   function onSessionDateChange(idx, val) {
@@ -1800,6 +1972,7 @@
     if (!stu || !list || !list[idx] || !val) return;
     guardPastMonthAction('Đổi ngày học', function() {
       list[idx].date = val;
+      selectedCalendarDate = val;
       reconcileSubsequentMonths(stu);
       saveStorage();
       refreshAllUI();
@@ -1863,6 +2036,10 @@
 
   function requestAddSessionRow() {
     var monthStr = getSelectedMonthStr();
+    if (selectedCalendarDate && selectedCalendarDate.indexOf(monthStr) === 0) {
+      requestAddSessionOnDate(selectedCalendarDate);
+      return;
+    }
     var parts = monthStr.split('-');
     var maxDays = new Date(Number(parts[0]), Number(parts[1]), 0).getDate();
     var day = Math.min(new Date().getDate(), maxDays);
@@ -1892,6 +2069,7 @@
         checkedIn: false
       });
 
+      selectedCalendarDate = fullDateStr;
       reconcileSubsequentMonths(stu);
       saveStorage();
       refreshAllUI();
@@ -2057,6 +2235,7 @@
 
     lines.push('Em chào ' + pTitle + ' ạ,');
     lines.push(pTitleCap + ' ơi, tháng ' + monthYearLabel + ' con học tổng cộng ' + data.billableSessions.length + ' buổi ạ.');
+    lines.push('');
 
     for (var k = 0; k < data.durKeys.length; k++) {
       var g = data.byDur[data.durKeys[k]];
@@ -2447,7 +2626,7 @@
 
       var tr = document.createElement('tr');
       tr.innerHTML =
-        '<td><b>' + stu.name + '</b></td>' +
+        '<td><div style="display:flex; justify-content:space-between; align-items:center;"><b>' + stu.name + '</b><span style="font-size:12.5px; color:var(--muted);">PH: ' + (stu.parentTitle || 'chị') + ' ' + stu.parentName + '</span></div></td>' +
         '<td>' + (stu.parentTitle || 'chị') + ' ' + stu.parentName + '</td>' +
         '<td>' + rateHtml + '</td>' +
         '<td>' + schedHtml + '</td>' +
@@ -2518,7 +2697,6 @@
     onStudentOrMonthChange();
   }
 
-  // Kiểm tra nếu URL có chứa mã kết nối nhanh từ QR (#sync=token|gistId)
   function checkMagicSyncUrlHash() {
     var hash = window.location.hash || '';
     if (hash.indexOf('#sync=') === 0) {
@@ -2537,13 +2715,13 @@
 
   (function initApp() {
     hydrateStaticIcons();
+    selectedCalendarDate = getTodayDateStr();
     document.getElementById('billingMonthInput').value = getCurrentMonthStr();
     loadStorage();
     checkMagicSyncUrlHash();
     resetStudentForm();
     updateSyncHeaderUI();
     refreshAllUI();
-    // Mặc định luôn mở màn hình Check-in đầu tiên theo yêu cầu
     switchTab('checkin');
     if (syncConfig.token && syncConfig.gistId) {
       pullFromCloud(false);
